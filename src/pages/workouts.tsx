@@ -10,13 +10,10 @@ import {
 import { Time } from '@/components/Time';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { useStopWatch } from '@/hooks/useStopWatch';
-import { useExercisesState } from '@/hooks/useExercisesState';
-
 
 export default function Workouts() {
-  const [exercisesSets, dispatchExercisesState] = useExercisesState([
-    { id: uuidv4(), bpm: '30', duration: '60', isFinished: true },
-    { id: uuidv4(), bpm: '80', duration: '80', isFinished: false },
+  const [sets, setSets] = useState([
+    { id: uuidv4(), bpm: '80', duration: '120', isFinished: false },
   ]);
 
   const [isRunning, setIsRunning] = useState(false);
@@ -52,22 +49,11 @@ export default function Workouts() {
         <ExerciseCard
           className="mb-3"
           title="五品音阶模进"
-          sets={exercisesSets}
-          onSetDeleted={(setId) => {
-            dispatchExercisesState({ type: 'DELETE_SET', payload: { setId } });
-          }}
-          onSetAdded={() => {
-            dispatchExercisesState({ type: 'ADD_SET' });
-          }}
-          onSetChanged={(set) => {
-            dispatchExercisesState({ type: 'UPDATE_SET', payload: { set } });
-          }}
-          onExerciseFinished={() => {
-            dispatchExercisesState({ type: 'FINISH_ALL' });
-          }}
+          sets={sets}
           onExerciseDeleted={() => {
             console.log('onExerciseDeleted');
           }}
+          onChange={setSets}
         />
       </div>
     </div>

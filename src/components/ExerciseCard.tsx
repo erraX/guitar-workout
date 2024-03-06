@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { produce } from 'immer';
 import {
   Button,
   Card,
@@ -36,30 +38,82 @@ export interface ExerciseSet {
 export interface ExerciseCardProps {
   title: string;
   className?: string;
-  sets?: ExerciseSet[];
+  enableUndoRedo?: boolean;
+  sets: ExerciseSet[];
 
-  // Change handlers
   onExerciseDeleted?: () => void;
-  onExerciseFinished?: () => void;
-
-  onSetAdded?: () => void;
-  onSetDeleted?: (setId: string) => void;
-  onSetChanged?: (set: ExerciseSet) => void;
+  onChange?: (newSets: ExerciseSet[]) => void;
 
   onUndo?: () => void;
   onRedo?: () => void;
 }
 
+const findSetById = (sets: ExerciseSet[], setId: string) => sets.findIndex(s => s.id === setId);
+
+const createEmptySet = (): ExerciseSet => ({
+  id: uuidv4(),
+  bpm: '80',
+  duration: '120',
+  isFinished: false,
+});
+
+type ProducerType =
+  | { type: 'UPDATE_DURATION', payload: { id: string, duration: string } }
+  | { type: 'UPDATE_BPM', payload: { id: string, bpm: string } }
+  | { type: 'TOGGLE_FINISHED', payload: { id: string, isFinished: boolean } }
+  | { type: 'FINISH_ALL', payload?: {} }
+  | { type: 'DELETE', payload: { id: string } }
+  | { type: 'ADD', payload?: {} };
+
+const produceSets = (sets: ExerciseSet[], { type, payload }: ProducerType) => produce(sets, (draftSets: ExerciseSet[]) => {
+  switch (type) {
+    case 'UPDATE_DURATION': {
+      const idx = findSetById(draftSets, payload.id);
+      if (idx > -1) {
+        draftSets[idx].duration = payload.duration;
+      }
+      break;
+    }
+    case 'UPDATE_BPM': {
+      const idx = findSetById(draftSets, payload.id);
+      if (idx > -1) {
+        draftSets[idx].bpm = payload.bpm;
+      }
+      break;
+    }
+    case 'TOGGLE_FINISHED': {
+      const idx = findSetById(draftSets, payload.id);
+      if (idx > -1) {
+        draftSets[idx].isFinished = payload.isFinished;
+      }
+      break;
+    }
+    case 'FINISH_ALL': {
+      draftSets.forEach(s => s.isFinished = true);
+      break;
+    }
+    case 'DELETE': {
+      const idx = findSetById(draftSets, payload.id);
+      if (idx > -1) {
+        draftSets.splice(idx, 1);
+      }
+      break;
+    }
+    case 'ADD': {
+      draftSets.push(createEmptySet());
+      break;
+    }
+  }
+});
+
 export const ExerciseCard: FC<ExerciseCardProps> = ({
   className,
   title,
   sets,
+  enableUndoRedo = false,
 
   onExerciseDeleted,
-  onExerciseFinished,
-  onSetAdded,
-  onSetDeleted,
-  onSetChanged,
+  onChange,
 
   onUndo,
   onRedo,
@@ -83,7 +137,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
           >
             <RiDeleteBinLine size="18" />
           </Button>
-          <Button
+          {enableUndoRedo && <Button
             isIconOnly
             className="ml-2"
             color="warning"
@@ -91,8 +145,8 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
             onClick={onUndo}
           >
             <RiArrowGoBackLine size="18" color="white" />
-          </Button>
-          <Button
+          </Button>}
+          {enableUndoRedo && <Button
             isIconOnly
             className="ml-2"
             color="warning"
@@ -100,7 +154,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
             onClick={onRedo}
           >
             <RiArrowGoForwardLine size="18" color="white" />
-          </Button>
+          </Button>}
         </CardHeader>
         <CardBody>
           <Table aria-label="exercise-table" className="mb-3">
@@ -127,10 +181,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                           }}
                           value={set.bpm}
                           onChange={(event) => {
-                            onSetChanged?.({
-                              ...set,
-                              bpm: event.target.value,
-                            });
+                            onChange?.(produceSets(
+                              sets,
+                              {
+                                type: 'UPDATE_BPM',
+                                payload: {
+                                  id: set.id,
+                                  bpm: event.target.value,
+                                },
+                              }
+                            ));
                           }}
                         />
                       }
@@ -147,10 +207,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                           }}
                           value={set.duration}
                           onChange={(event) => {
-                            onSetChanged?.({
-                              ...set,
-                              duration: event.target.value,
-                            });
+                            onChange?.(produceSets(
+                              sets,
+                              {
+                                type: 'UPDATE_DURATION',
+                                payload: {
+                                  id: set.id,
+                                  duration: event.target.value,
+                                },
+                              }
+                            ));
                           }}
                         />
                       }
@@ -162,10 +228,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                           color="success"
                           size="sm"
                           onClick={() => {
-                            onSetChanged?.({
-                              ...set,
-                              isFinished: false,
-                            });
+                            onChange?.(produceSets(
+                              sets,
+                              {
+                                type: 'TOGGLE_FINISHED',
+                                payload: {
+                                  id: set.id,
+                                  isFinished: false,
+                                },
+                              }
+                            ));
                           }}
                         >
                           <RiCheckboxLine color="white" size="18" />
@@ -175,10 +247,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                           color="success"
                           size="sm"
                           onClick={() => {
-                            onSetChanged?.({
-                              ...set,
-                              isFinished: true,
-                            });
+                            onChange?.(produceSets(
+                              sets,
+                              {
+                                type: 'TOGGLE_FINISHED',
+                                payload: {
+                                  id: set.id,
+                                  isFinished: true,
+                                },
+                              }
+                            ));
                           }}
                         >
                           <RiCheckboxBlankLine color="white" size="18" />
@@ -190,7 +268,15 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         color="danger"
                         size="sm"
                         onClick={() => {
-                          onSetDeleted?.(set.id);
+                          onChange?.(produceSets(
+                            sets,
+                            {
+                              type: 'DELETE',
+                              payload: {
+                                id: set.id,
+                              },
+                            }
+                          ));
                         }}
                       >
                         <RiDeleteBinLine size="18" />
@@ -207,7 +293,10 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               variant="flat"
               size="sm"
               onClick={() => {
-                onSetAdded?.();
+                onChange?.(produceSets(
+                  sets,
+                  { type: 'ADD' }
+                ));
               }}
             >
               Add Set
@@ -217,7 +306,12 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               variant="flat"
               size="sm"
               color="danger"
-              onClick={onExerciseFinished}
+              onClick={() => {
+                onChange?.(produceSets(
+                  sets,
+                  { type: 'FINISH_ALL' }
+                ));
+              }}
             >
               Complete All
             </Button>
