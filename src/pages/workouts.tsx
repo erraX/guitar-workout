@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Button,
 } from '@nextui-org/react';
@@ -9,8 +10,15 @@ import {
 import { Time } from '@/components/Time';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { useStopWatch } from '@/hooks/useStopWatch';
+import { useExercisesState } from '@/hooks/useExercisesState';
+
 
 export default function Workouts() {
+  const [exercisesSets, dispatchExercisesState] = useExercisesState([
+    { id: uuidv4(), bpm: '30', duration: '60', isFinished: true },
+    { id: uuidv4(), bpm: '80', duration: '80', isFinished: false },
+  ]);
+
   const [isRunning, setIsRunning] = useState(false);
   const stopWatch = useStopWatch();
 
@@ -38,16 +46,28 @@ export default function Workouts() {
         }
       </div>
       <div className="flex flex-col w-full mb-6">
-        <Button className="mb-2" color="primary">Add exercise</Button>
+        <Button className="mb-2" color="primary">Add Exercise</Button>
       </div>
       <div className="w-full">
         <ExerciseCard
           className="mb-3"
           title="五品音阶模进"
-          sets={[
-            { bpm: '30', duration: '60', isFinished: true },
-            { bpm: '60', duration: '80', isFinished: false },
-          ]}
+          sets={exercisesSets}
+          onSetDeleted={(setId) => {
+            dispatchExercisesState({ type: 'DELETE_SET', payload: { setId } });
+          }}
+          onSetAdded={() => {
+            dispatchExercisesState({ type: 'ADD_SET' });
+          }}
+          onSetChanged={(set) => {
+            dispatchExercisesState({ type: 'UPDATE_SET', payload: { set } });
+          }}
+          onExerciseFinished={() => {
+            dispatchExercisesState({ type: 'FINISH_ALL' });
+          }}
+          onExerciseDeleted={() => {
+            console.log('onExerciseDeleted');
+          }}
         />
       </div>
     </div>
