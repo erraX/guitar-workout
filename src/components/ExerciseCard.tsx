@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { produce } from 'immer';
 import {
   Button,
@@ -18,6 +17,10 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
   useDisclosure,
 } from '@nextui-org/react';
 import {
@@ -26,14 +29,10 @@ import {
   RiCheckboxBlankLine,
   RiArrowGoBackLine,
   RiArrowGoForwardLine,
+  RiSettings2Line,
 } from "@remixicon/react";
-
-export interface ExerciseSet {
-  id: string;
-  bpm: string;
-  duration: string;
-  isFinished: boolean;
-}
+import { ExerciseSet } from '@/types';
+import { createEmptySet } from '@/utils/create-empty-set';
 
 export interface ExerciseCardProps {
   title: string;
@@ -50,20 +49,13 @@ export interface ExerciseCardProps {
 
 const findSetById = (sets: ExerciseSet[], setId: string) => sets.findIndex(s => s.id === setId);
 
-const createEmptySet = (): ExerciseSet => ({
-  id: uuidv4(),
-  bpm: '80',
-  duration: '120',
-  isFinished: false,
-});
-
 type ProducerType =
   | { type: 'UPDATE_DURATION', payload: { id: string, duration: string } }
   | { type: 'UPDATE_BPM', payload: { id: string, bpm: string } }
   | { type: 'TOGGLE_FINISHED', payload: { id: string, isFinished: boolean } }
   | { type: 'FINISH_ALL', payload?: {} }
   | { type: 'DELETE', payload: { id: string } }
-  | { type: 'ADD', payload?: {} };
+  | { type: 'ADD', payload?: { set: ExerciseSet } };
 
 const produceSets = (sets: ExerciseSet[], { type, payload }: ProducerType) => produce(sets, (draftSets: ExerciseSet[]) => {
   switch (type) {
@@ -100,7 +92,7 @@ const produceSets = (sets: ExerciseSet[], { type, payload }: ProducerType) => pr
       break;
     }
     case 'ADD': {
-      draftSets.push(createEmptySet());
+      draftSets.push(createEmptySet(payload?.set));
       break;
     }
   }
@@ -244,7 +236,6 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                         </Button>
                         : <Button
                           isIconOnly
-                          color="success"
                           size="sm"
                           onClick={() => {
                             onChange?.(produceSets(
@@ -262,25 +253,47 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                           <RiCheckboxBlankLine color="white" size="18" />
                         </Button>
                       }
-                      <Button
-                        isIconOnly
-                        className="ml-2"
-                        color="danger"
-                        size="sm"
-                        onClick={() => {
-                          onChange?.(produceSets(
-                            sets,
-                            {
-                              type: 'DELETE',
-                              payload: {
-                                id: set.id,
-                              },
-                            }
-                          ));
-                        }}
-                      >
-                        <RiDeleteBinLine size="18" />
-                      </Button>
+                      <Dropdown>
+                        <DropdownTrigger>
+                          <Button
+                            isIconOnly
+                            className="ml-2"
+                            size="sm"
+                          >
+                            <RiSettings2Line size="18" color="white" />
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu onAction={(key) => {
+                          if (key === 'delete') {
+                            onChange?.(produceSets(
+                              sets,
+                              {
+                                type: 'DELETE',
+                                payload: {
+                                  id: set.id,
+                                },
+                              }
+                            ));
+                            return;
+                          }
+
+                          if (key === 'duplicate') {
+                            onChange?.(produceSets(
+                              sets,
+                              {
+                                type: 'ADD',
+                                payload: {
+                                  set,
+                                },
+                              }
+                            ));
+                            return;
+                          }
+                        }}>
+                          <DropdownItem key="delete" className="text-danger" color="danger">Delete</DropdownItem>
+                          <DropdownItem key="duplicate">Duplicate</DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
                     </TableCell>
                   </TableRow>
                 ))
@@ -295,7 +308,10 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
               onClick={() => {
                 onChange?.(produceSets(
                   sets,
-                  { type: 'ADD' }
+                  {
+                    type: 'ADD',
+                    payload: { set: sets[sets.length - 1] },
+                  }
                 ));
               }}
             >
@@ -322,21 +338,21 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Delete exercise</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Delete exercise?</ModalHeader>
               <ModalBody>
                 <p>
-                  Are you sure to delete this exercise?
+                  This will delete "{title}"
                 </p>
               </ModalBody>
               <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
                 <Button color="danger" onPress={() => {
                   onExerciseDeleted?.();
                   onClose();
                 }}>
                   Delete
-                </Button>
-                <Button color="primary" variant="light" onPress={onClose}>
-                  Cancel
                 </Button>
               </ModalFooter>
             </>

@@ -8,6 +8,7 @@ import {
   NavbarContent,
   NavbarItem,
   Link,
+  Button,
 } from '@nextui-org/react';
 
 const inter = Alumni_Sans({ subsets: ['latin'] })
@@ -23,17 +24,23 @@ export default function App({ Component, pageProps }: AppProps) {
           <NavbarContent className="hidden sm:flex gap-4" justify="center">
             <NavbarItem isActive>
               <Link color="foreground" href="#">
-                Workouts
+                <Button variant="flat" color="primary">
+                  WORKOUTS
+                </Button>
               </Link>
             </NavbarItem>
             <NavbarItem>
               <Link href="#" aria-current="page">
-                Exercises
+                <Button variant="light" color="primary">
+                  EXERCISES
+                </Button>
               </Link>
             </NavbarItem>
             <NavbarItem>
               <Link href="#" aria-current="page">
-                History
+                <Button variant="light" color="primary">
+                  HISTORY
+                </Button>
               </Link>
             </NavbarItem>
           </NavbarContent>
