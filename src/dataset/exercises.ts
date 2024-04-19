@@ -19,5 +19,15 @@ export const exercises: Exercise[] = [
     name: '左右手同步初级',
     description: '一弦578, 二弦578',
   },
+  {
+    id: 'ex_5',
+    name: '纯下拨练习',
+    description: '',
+  },
+  {
+    id: 'ex_6',
+    name: '下拨8分加16分音符',
+    description: '',
+  },
 ];
 

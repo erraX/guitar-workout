@@ -1,20 +1,21 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Workout } from '@/types';
 
 export const workoutsTemplates: Workout[] = [
   {
-    id: 'wot_1',
+    id: uuidv4(),
     name: '音阶基本功',
     duration: 0,
     exercises: [
       {
-        id: 'exxx_1',
+        id: uuidv4(),
         exerciseId: 'ex_1',
         sets: [
           { id: 'ex_1_s_1', bpm: '80', duration: '120', isFinished: false },
         ],
       },
       {
-        id: 'exxxx_2',
+        id: uuidv4(),
         exerciseId: 'ex_2',
         sets: [
           { id: 'ex_2_s_1', bpm: '80', duration: '120', isFinished: false },
