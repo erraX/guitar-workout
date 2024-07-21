@@ -5,22 +5,16 @@ export interface ExerciseSet {
   isFinished: boolean
 }
 
-export interface Exercise {
-  id: string
-  name: string
-  description?: string
-}
-
 export interface ExerciseInWorkout {
   id: string;
-  exerciseId: string;
+  exerciseId: number;
   sets: ExerciseSet[];
 }
 
 export interface Workout {
-  id: string
-  name: string
-  duration: number
-  exercises: ExerciseInWorkout[]
+  id: string;
+  name: string;
+  duration: number;
+  exercises: ExerciseInWorkout[];
 }
 

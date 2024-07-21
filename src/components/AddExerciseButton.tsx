@@ -12,13 +12,17 @@ import {
   SelectItem,
   useDisclosure,
 } from "@nextui-org/react";
+import { Exercise } from "@prisma/client";
 import { FC, useState } from "react";
 
 export interface AddExerciseButtonProps {
+  exercises: Exercise[];
   onAddExercise(exerciseId: string): void;
 }
 
+// TODO:  not pass in, just use a server component to fetch
 export const AddExerciseButton: FC<AddExerciseButtonProps> = ({
+  exercises,
   onAddExercise,
 }) => {
   const modal = useDisclosure();
