@@ -9,7 +9,6 @@ import {
   TableCell,
 } from "@nextui-org/react";
 import { Exercise } from "@prisma/client";
-
 export interface ExercisesTableProps {
   data: Exercise[];
 }

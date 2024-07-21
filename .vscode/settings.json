@@ -17,5 +17,14 @@
             "filePath": "public",
             "group": "Default"
         }
-    ]
+    ],
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+      },
+    "editor.formatOnSaveMode": "modificationsIfAvailable",
 }
