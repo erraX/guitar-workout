@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@nextui-org/react": "^2.2.9",
+    "@nextui-org/react": "^2.4.6",
     "@prisma/client": "5.16.1",
     "@remixicon/react": "^4.2.0",
     "framer-motion": "^11.0.8",

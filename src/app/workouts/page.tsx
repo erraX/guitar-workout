@@ -18,7 +18,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { useState } from "react";
-import StopWatchButton from "./components/StopWatchButton";
+import StopWatchButton from "./_components/StopWatchButton";
 
 const getExerciseById = (exercises: Exercise[], id: string) =>
   exercises.findIndex((e) => e.id === id);

@@ -1,14 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
 import { Button, Input } from "@nextui-org/react";
 import { createExercise } from '@/actions/exercise';
 
+const getInitialValues = () => ({
+  name: "",
+  description: "",
+});
+
 export default function ExercisesCreationPage() {
-  const [values, setValues] = useState({
-    name: "",
-    description: "",
-  });
+  const router = useRouter();
+
+  const [values, setValues] = useState(getInitialValues());
+  const reset = () => {
+    setValues(getInitialValues());
+  };
 
   const setFieldValue = (fieldName: keyof typeof values, value: string) => {
     setValues((values) => ({
@@ -17,8 +25,13 @@ export default function ExercisesCreationPage() {
     }));
   };
 
-  const handleSubmit = () => {
-    createExercise(values);
+  const handleSubmit = async () => {
+    await createExercise(values);
+    reset();
+  };
+
+  const handleBack = () => {
+    router.back();
   };
 
   return (
@@ -37,6 +50,9 @@ export default function ExercisesCreationPage() {
       />
       <Button color="primary" onClick={handleSubmit}>
         Submit
+      </Button>
+      <Button onClick={handleBack}>
+        Back
       </Button>
     </div>
   );
