@@ -35,25 +35,27 @@ export default function ExercisesCreationPage() {
   };
 
   return (
-    <div>
+    <div className="flex w-full flex-col">
       <Input
+        className="mb-5"
         type="name"
         label="Name"
         value={values.name}
         onChange={(evt) => setFieldValue("name", evt.target.value)}
       />
       <Input
+        className="mb-5"
         type="description"
         label="Description"
         value={values.description}
         onChange={(evt) => setFieldValue("description", evt.target.value)}
       />
-      <Button color="primary" onClick={handleSubmit}>
-        Submit
-      </Button>
-      <Button onClick={handleBack}>
-        Back
-      </Button>
+      <div className="flex">
+        <Button className="mr-5" color="primary" onClick={handleSubmit}>
+          Submit
+        </Button>
+        <Button onClick={handleBack}>Back</Button>
+      </div>
     </div>
   );
 }

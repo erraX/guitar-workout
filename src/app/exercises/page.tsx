@@ -6,8 +6,8 @@ export default async function ExercisesPage() {
   const exercises = await getExercises();
 
   return (
-    <div>
-      <Link href="/exercises/create">
+    <div className="flex flex-col w-full">
+      <Link className="mb-3" href="/exercises/create">
         <Button color="primary">Create Exercise</Button>
       </Link>
       <ExercisesTable data={exercises} />
