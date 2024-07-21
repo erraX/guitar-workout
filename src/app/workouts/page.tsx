@@ -17,15 +17,14 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
-import { RiPlayCircleLine, RiStopCircleLine } from "@remixicon/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import StopWatchButton from "./components/StopWatchButton";
 
 const getExerciseById = (exercises: Exercise[], id: string) =>
   exercises.findIndex((e) => e.id === id);
 
 const getExerciseNameById = (exercises: Exercise[], id: string) => {
   const idx = getExerciseById(exercises, id);
-
   return idx > -1 ? exercises[idx].name : "";
 };
 
@@ -49,28 +48,16 @@ export default function Workouts() {
     dispatchWorkout({ type: "RESET" });
   };
 
-  useEffect(() => {
-    dispatchWorkout({ type: "RESET" });
-  }, [dispatchWorkout]);
-
   return (
     <>
       <div className="flex flex-col items-center w-full">
         <div className="flex justify-center items-center mb-6 w-full">
           <Time className="mr-3" seconds={stopWatch.time} />
-          {isRunning ? (
-            <Button
-              isIconOnly
-              color="danger"
-              onClick={finishedConfirmModal.onOpen}
-            >
-              <RiStopCircleLine />
-            </Button>
-          ) : (
-            <Button isIconOnly color="success" onClick={handleStart}>
-              <RiPlayCircleLine color="white" />
-            </Button>
-          )}
+          <StopWatchButton
+            isRunning={isRunning}
+            onStop={finishedConfirmModal.onOpen}
+            onStart={handleStart}
+          />
         </div>
         <div className="flex flex-col w-full mb-6">
           <AddExerciseButton

@@ -1,5 +1,6 @@
 "use client";
 
+import { PropsWithChildren } from "react";
 import { storage } from "@/storage";
 import {
   Button,
@@ -12,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@nextui-org/react";
+import { usePathname } from "next/navigation";
 import { RiExportLine } from "@remixicon/react";
 
 import { Alumni_Sans } from "next/font/google";
@@ -19,31 +21,34 @@ import { Alumni_Sans } from "next/font/google";
 const inter = Alumni_Sans({ subsets: ["latin"] });
 
 export default function Navigator() {
+  const pathname = usePathname();
+  const isSubRoute = (routerPath: string) => new RegExp(`^${routerPath}`).test(pathname);
+
   return (
     <Navbar maxWidth="full">
       <NavbarBrand>
         <p className={`text-2xl font-bold ${inter.className}`}>🎸 WORKOUT</p>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem isActive>
-          <Link color="foreground" href="#">
-            <Button variant="flat" color="primary">
+        <NavbarItem>
+          <Link href="/workouts">
+            <NavButton isActive={isSubRoute('/workouts')}>
               WORKOUTS
-            </Button>
+            </NavButton>
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="#" aria-current="page">
-            <Button variant="light" color="primary">
+          <Link href="/exercises">
+            <NavButton isActive={isSubRoute('/exercises')}>
               EXERCISES
-            </Button>
+            </NavButton>
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="#" aria-current="page">
-            <Button variant="light" color="primary">
+          <Link href="/historys">
+            <NavButton isActive={isSubRoute('/history')}>
               HISTORY
-            </Button>
+            </NavButton>
           </Link>
         </NavbarItem>
       </NavbarContent>
@@ -76,5 +81,14 @@ export default function Navigator() {
         </NavbarItem>
       </NavbarContent>
     </Navbar>
+  );
+}
+
+function NavButton({ children, isActive }: PropsWithChildren<{ isActive?: boolean }>) {
+  const variant = isActive ? 'flat' : 'light';
+  return (
+    <Button variant={variant} color="primary">
+      {children}
+    </Button>
   );
 }
