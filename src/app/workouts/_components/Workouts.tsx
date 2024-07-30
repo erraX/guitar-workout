@@ -7,17 +7,10 @@ import { useStopWatch } from "@/hooks/useStopWatch";
 import { useWorkoutsState } from "@/hooks/useWorkoutsState";
 import { storage } from "@/storage";
 import { Exercise } from "@prisma/client";
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
-} from "@nextui-org/react";
+import { useDisclosure } from "@nextui-org/react";
 import { useState } from "react";
 import StopWatchButton from "./StopWatchButton";
+import FinishConfirmModal from "./FinishConfirmModal";
 
 const getExerciseById = (exercises: Exercise[], id: number) =>
   exercises.findIndex((e) => e.id === id);
@@ -33,7 +26,6 @@ export interface WorkoutsProps {
 
 export function Workouts({ exercises }: WorkoutsProps) {
   const finishedConfirmModal = useDisclosure();
-
   const [workout, dispatchWorkout] = useWorkoutsState();
 
   const [isRunning, setIsRunning] = useState(false);
@@ -68,7 +60,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
             onAddExercise={(exerciseId) => {
               dispatchWorkout({
                 type: "ADD_EXERCISE",
-                payload: { exerciseId },
+                payload: { exerciseId: Number(exerciseId) },
               });
             }}
           />
@@ -99,37 +91,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
           ))}
         </div>
       </div>
-      <Modal
-        isOpen={finishedConfirmModal.isOpen}
-        onOpenChange={finishedConfirmModal.onOpenChange}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Finish workout?
-              </ModalHeader>
-              <ModalBody>
-                <p>This will stop the workout</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button variant="light" onPress={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  color="danger"
-                  onPress={() => {
-                    onClose();
-                    handleStop();
-                  }}
-                >
-                  Stop
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <FinishConfirmModal modal={finishedConfirmModal} onStop={handleStop} />
     </>
   );
 }

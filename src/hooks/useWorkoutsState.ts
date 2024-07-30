@@ -8,7 +8,7 @@ export type WorkoutsState = Workout;
 
 export type WorkoutsAction =
   | { type: "RESET"; payload?: {} }
-  | { type: "ADD_EXERCISE"; payload: { exerciseId: string } }
+  | { type: "ADD_EXERCISE"; payload: { exerciseId: number } }
   | { type: "DELETE_EXERCISE"; payload: { exerciseWorkoutId: string } }
   | {
       type: "UPDATE_EXERCISE";
@@ -44,6 +44,7 @@ export const useWorkoutsState = (
           exerciseId: payload.exerciseId,
           sets: [createEmptySet()],
         });
+        console.log("draft.exercises", payload);
         break;
       }
 
