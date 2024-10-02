@@ -11,8 +11,8 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      width: {
-        'page': '800px',
+      maxWidth: {
+        page: "1600px",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

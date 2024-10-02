@@ -1,61 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from 'next/navigation';
-import { Button, Input } from "@nextui-org/react";
-import { createExercise } from '@/actions/exercise';
-
-const getInitialValues = () => ({
-  name: "",
-  description: "",
-});
+import { useRouter } from "next/navigation";
+import { createExercise } from "@/actions/exercise";
+import ExerciseForm from "../_components/ExerciseForm";
 
 export default function ExercisesCreationPage() {
   const router = useRouter();
 
-  const [values, setValues] = useState(getInitialValues());
-  const reset = () => {
-    setValues(getInitialValues());
-  };
-
-  const setFieldValue = (fieldName: keyof typeof values, value: string) => {
-    setValues((values) => ({
-      ...values,
-      [fieldName]: value,
-    }));
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: any) => {
     await createExercise(values);
-    reset();
-  };
-
-  const handleBack = () => {
-    router.back();
+    router.push(`/exercises/`);
   };
 
   return (
-    <div className="flex w-full flex-col">
-      <Input
-        className="mb-5"
-        type="name"
-        label="Name"
-        value={values.name}
-        onChange={(evt) => setFieldValue("name", evt.target.value)}
-      />
-      <Input
-        className="mb-5"
-        type="description"
-        label="Description"
-        value={values.description}
-        onChange={(evt) => setFieldValue("description", evt.target.value)}
-      />
-      <div className="flex">
-        <Button className="mr-5" color="primary" onClick={handleSubmit}>
-          Submit
-        </Button>
-        <Button onClick={handleBack}>Back</Button>
-      </div>
-    </div>
+    <ExerciseForm
+      initialValues={{
+        name: "",
+        link: "",
+        description: "",
+      }}
+      onSubmit={handleSubmit}
+    />
   );
 }

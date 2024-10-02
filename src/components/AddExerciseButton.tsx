@@ -1,6 +1,5 @@
 "use client";
 
-import { exercises } from "@/dataset/exercises";
 import {
   Button,
   Modal,
@@ -17,20 +16,23 @@ import { FC, useState } from "react";
 
 export interface AddExerciseButtonProps {
   exercises: Exercise[];
-  onAddExercise(exerciseId: string): void;
+  onAddExercises(exerciseIds: string[]): void;
 }
 
-// TODO:  not pass in, just use a server component to fetch
 export const AddExerciseButton: FC<AddExerciseButtonProps> = ({
   exercises,
-  onAddExercise,
+  onAddExercises,
 }) => {
   const modal = useDisclosure();
-  const [selectedExercise, setSelectedExercise] = useState<string>();
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
 
   return (
     <>
-      <Button className="mb-2" color="primary" onClick={modal.onOpen}>
+      <Button
+        className="mb-2 w-fit self-center"
+        color="primary"
+        onClick={modal.onOpen}
+      >
         Add Exercise
       </Button>
       <Modal isOpen={modal.isOpen} onOpenChange={modal.onOpenChange}>
@@ -41,13 +43,14 @@ export const AddExerciseButton: FC<AddExerciseButtonProps> = ({
                 Add exercise
               </ModalHeader>
               <ModalBody>
-                <p>Please select one exercise to add</p>
-                <p>
+                <div>Please select one exercise to add</div>
+                <div>
                   <Select
+                    selectionMode="multiple"
                     label="Select an exercise"
                     className="max-w-xs"
                     onChange={(evt) => {
-                      setSelectedExercise(evt.target.value);
+                      setSelectedExercises(evt.target.value.split(","));
                     }}
                   >
                     {exercises.map((exercise) => (
@@ -56,7 +59,7 @@ export const AddExerciseButton: FC<AddExerciseButtonProps> = ({
                       </SelectItem>
                     ))}
                   </Select>
-                </p>
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
@@ -64,11 +67,11 @@ export const AddExerciseButton: FC<AddExerciseButtonProps> = ({
                 </Button>
                 <Button
                   color="primary"
-                  isDisabled={!selectedExercise}
+                  isDisabled={!selectedExercises.length}
                   onPress={() => {
                     onClose();
-                    if (selectedExercise) {
-                      onAddExercise(selectedExercise);
+                    if (selectedExercises.length) {
+                      onAddExercises(selectedExercises);
                     }
                   }}
                 >

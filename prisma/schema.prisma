@@ -11,7 +11,35 @@ datasource db {
 }
 
 model Exercise {
-  id    Int     @id @default(autoincrement())
-  name  String
+  id          Int             @id @default(autoincrement())
+  name        String
   description String?
+  link        String?
+  workouts    WorkoutExercise[]
+  createdAt   DateTime        @default(now())
+  status      String          @default("ACTIVE")
+}
+
+model Workout {
+  id        Int               @id @default(autoincrement())
+  duration  Int
+  exercises WorkoutExercise[]
+  createdAt DateTime          @default(now())
+}
+
+model WorkoutExercise {
+  id         Int     @id @default(autoincrement())
+  workout    Workout @relation(fields: [workoutId], references: [id])
+  workoutId  Int
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  exerciseId Int
+  sets       Set[]
+}
+
+model Set {
+  id                Int             @id @default(autoincrement())
+  bpm               Int
+  duration          Int
+  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id])
+  workoutExerciseId Int
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { AddExerciseButton } from "@/components/AddExerciseButton";
 import { ExerciseCard } from "@/components/ExerciseCard";
 import { Time } from "@/components/Time";
@@ -8,7 +9,8 @@ import { useWorkoutsState } from "@/hooks/useWorkoutsState";
 import { storage } from "@/storage";
 import { Exercise } from "@prisma/client";
 import { useDisclosure } from "@nextui-org/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createWorkout } from "@/actions/workout";
 import StopWatchButton from "./StopWatchButton";
 import FinishConfirmModal from "./FinishConfirmModal";
 
@@ -22,11 +24,19 @@ const getExerciseNameById = (exercises: Exercise[], id: number) => {
 
 export interface WorkoutsProps {
   exercises: Exercise[];
+  workoutTemplate?: any;
 }
 
-export function Workouts({ exercises }: WorkoutsProps) {
+export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
+  const router = useRouter();
   const finishedConfirmModal = useDisclosure();
-  const [workout, dispatchWorkout] = useWorkoutsState();
+  const [workout, dispatchWorkout] = useWorkoutsState(
+    workoutTemplate?.exercises.map((exercise: any) => ({
+      id: exercise.id,
+      exerciseId: exercise.exerciseId,
+      sets: exercise.sets,
+    })) || []
+  );
 
   const [isRunning, setIsRunning] = useState(false);
   const stopWatch = useStopWatch();
@@ -36,12 +46,53 @@ export function Workouts({ exercises }: WorkoutsProps) {
     stopWatch.start();
   };
 
-  const handleStop = () => {
+  const handleAbort = () => {
     setIsRunning(false);
     stopWatch.stop();
-    storage.pushWorkout(workout);
-    dispatchWorkout({ type: "RESET" });
   };
+
+  const handleStop = async () => {
+    setIsRunning(false);
+    stopWatch.stop();
+
+    const result = await createWorkout({
+      duration: workout.duration,
+      exercises: workout.exercises.map((exercise) => ({
+        id: exercise.exerciseId,
+        sets: exercise.sets
+          .filter((set) => set.isFinished)
+          .map((set) => ({
+            bpm: Number(set.bpm),
+            duration: Number(set.duration),
+          })),
+      })),
+    });
+    if (result.success) {
+      storage.pushWorkout(workout);
+      dispatchWorkout({ type: "RESET" });
+    } else {
+      console.log("create workout error", result.error);
+    }
+  };
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isRunning) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isRunning]);
+
+  useEffect(() => {
+    router.replace(`/workouts`);
+  }, []);
 
   return (
     <>
@@ -57,10 +108,12 @@ export function Workouts({ exercises }: WorkoutsProps) {
         <div className="flex flex-col w-full mb-6">
           <AddExerciseButton
             exercises={exercises}
-            onAddExercise={(exerciseId) => {
-              dispatchWorkout({
-                type: "ADD_EXERCISE",
-                payload: { exerciseId: Number(exerciseId) },
+            onAddExercises={(exerciseIds) => {
+              exerciseIds.forEach((exerciseId) => {
+                dispatchWorkout({
+                  type: "ADD_EXERCISE",
+                  payload: { exerciseId: Number(exerciseId) },
+                });
               });
             }}
           />
@@ -91,7 +144,11 @@ export function Workouts({ exercises }: WorkoutsProps) {
           ))}
         </div>
       </div>
-      <FinishConfirmModal modal={finishedConfirmModal} onStop={handleStop} />
+      <FinishConfirmModal
+        modal={finishedConfirmModal}
+        onStop={handleStop}
+        onAbort={handleAbort}
+      />
     </>
   );
 }

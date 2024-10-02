@@ -12,11 +12,13 @@ export type UseDisclosureReturn = ReturnType<typeof useDisclosure>;
 
 export interface FinishConfirmModalProps {
   modal: UseDisclosureReturn;
+  onAbort?: () => void;
   onStop?: () => void;
 }
 
 export default function FinishConfirmModal({
   modal,
+  onAbort,
   onStop,
 }: FinishConfirmModalProps) {
   return (
@@ -32,7 +34,16 @@ export default function FinishConfirmModal({
             </ModalBody>
             <ModalFooter>
               <Button variant="light" onPress={onClose}>
-                Cancel
+                Dismiss
+              </Button>
+              <Button
+                color="warning"
+                onPress={() => {
+                  onClose();
+                  onAbort?.();
+                }}
+              >
+                Abort
               </Button>
               <Button
                 color="danger"
