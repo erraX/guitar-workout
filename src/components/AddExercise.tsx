@@ -14,12 +14,12 @@ import {
 import { Exercise } from "@prisma/client";
 import { FC, useState } from "react";
 
-export interface AddExerciseButtonProps {
+export interface AddExerciseProps {
   exercises: Exercise[];
   onAddExercises(exerciseIds: string[]): void;
 }
 
-export const AddExerciseButton: FC<AddExerciseButtonProps> = ({
+export const AddExercise: FC<AddExerciseProps> = ({
   exercises,
   onAddExercises,
 }) => {

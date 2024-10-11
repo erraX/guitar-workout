@@ -3,7 +3,7 @@
 import { ReactNode, useRef } from "react";
 import cls from "classnames";
 
-import useStore from "./store";
+import { useAutoCompleteStore } from "./AutoComplete.store";
 import useClickOutside from "./useClickOutside";
 
 import Dropdown from "./Dropdown";
@@ -41,7 +41,7 @@ export default function AutoComplete({
   creator,
 }: AutoCompleteProps) {
   const rootEl = useRef<HTMLDivElement>(null);
-  const store = useStore();
+  const store = useAutoCompleteStore();
 
   useClickOutside({
     target: rootEl,

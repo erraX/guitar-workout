@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <div className="w-page m-auto">
+          <div className="max-w-page min-w-page m-auto">
             <Navigator />
             <main className="pt-5 px-6 flex">{children}</main>
           </div>

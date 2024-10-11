@@ -63,6 +63,36 @@ function AutoCompleteWrapper() {
           }}
         />
       </div>
+      <div>
+        <AutoComplete
+          value={value}
+          options={options}
+          filter={(inputValue, options) => {
+            if (!inputValue) return options;
+            return options.filter((option) =>
+              option.label.includes(inputValue)
+            );
+          }}
+          renderOption={(option) => (
+            <span>
+              {option.label} - {option.value}
+            </span>
+          )}
+          renderCreator={(inputValue) => <span>Create: {inputValue}</span>}
+          onChange={(option) => {
+            setValue(option.value);
+          }}
+          creator={async (inputValue) => {
+            await delay(2000);
+            const newOption = {
+              label: `${inputValue} - label`,
+              value: inputValue,
+            };
+            setOptions((state) => [...state, newOption]);
+            return newOption;
+          }}
+        />
+      </div>
     </div>
   );
 }

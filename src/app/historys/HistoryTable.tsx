@@ -13,6 +13,7 @@ import {
 } from "@nextui-org/react";
 import { Workout } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { Date } from "@/components/Date";
 
 export interface HistorysTableProps {
   data: Workout[];
@@ -56,7 +57,9 @@ export function HistorysTable({ data }: HistorysTableProps) {
                 )
               )}
             </TableCell>
-            <TableCell>{workout.createdAt.toLocaleDateString()}</TableCell>
+            <TableCell>
+              <Date date={workout.createdAt} />
+            </TableCell>
             <TableCell>
               <Button
                 className="mr-1"

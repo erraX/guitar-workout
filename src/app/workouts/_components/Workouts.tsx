@@ -1,18 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AddExerciseButton } from "@/components/AddExerciseButton";
-import { ExerciseCard } from "@/components/ExerciseCard";
-import { Time } from "@/components/Time";
-import { useWorkoutsState } from "@/hooks/useWorkoutsState";
 import { Exercise } from "@prisma/client";
 import { useDisclosure } from "@nextui-org/react";
-import { useEffect } from "react";
+
 import { createWorkout } from "@/actions/workout";
-import StopWatchButton from "./StopWatchButton";
-import FinishConfirmModal from "./FinishConfirmModal";
+
+import { AddExercise } from "@/components/AddExercise";
+import { ExerciseCard } from "@/components/ExerciseCard";
 
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
+import { useWorkoutsStore } from "@/hooks/useWorkoutsStore";
+
+import FinishConfirmModal from "./FinishConfirmModal";
+import StopWatch from "./StopWatch";
 
 import { useWorkoutTaskState } from "../_utils/useWorkoutTaskState";
 
@@ -32,13 +34,8 @@ export interface WorkoutsProps {
 export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
   const finishedConfirmModal = useDisclosure();
 
-  const [workout, dispatchWorkout] = useWorkoutsState(
-    workoutTemplate?.exercises.map((exercise: any) => ({
-      id: exercise.id,
-      exerciseId: exercise.exerciseId,
-      sets: exercise.sets,
-    })) || []
-  );
+  const { reset, addExercise, deleteExercise, updateExercise, ...workout } =
+    useWorkoutsStore(workoutTemplate);
 
   const { isRunning, time, start, abort, stop } = useWorkoutTaskState();
 
@@ -57,42 +54,36 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
           })),
       })),
     });
-    if (result.success) {
-      dispatchWorkout({ type: "RESET" });
-    } else {
+    if (!result.success) {
       console.log("create workout error", result.error);
     }
   };
 
   useBeforeUnload(isRunning);
-
   useClearQueryParams();
 
   return (
     <>
       <div className="flex flex-col items-center w-full">
         <div className="flex justify-center items-center mb-6 w-full">
-          <Time className="mr-3" seconds={time} />
-          <StopWatchButton
+          <StopWatch
+            time={time}
             isRunning={isRunning}
             onStop={finishedConfirmModal.onOpen}
             onStart={start}
           />
         </div>
         <div className="flex flex-col w-full mb-6">
-          <AddExerciseButton
+          <AddExercise
             exercises={exercises}
             onAddExercises={(exerciseIds) => {
               exerciseIds.forEach((exerciseId) => {
-                dispatchWorkout({
-                  type: "ADD_EXERCISE",
-                  payload: { exerciseId: Number(exerciseId) },
-                });
+                addExercise(Number(exerciseId));
               });
             }}
           />
         </div>
-        <div className="w-full">
+        <div className="w-full max-w-3xl">
           {workout.exercises.map((exercise) => (
             <ExerciseCard
               key={exercise.id}
@@ -100,19 +91,10 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
               title={getExerciseNameById(exercises, exercise.exerciseId)}
               sets={exercise.sets}
               onExerciseDeleted={() => {
-                dispatchWorkout({
-                  type: "DELETE_EXERCISE",
-                  payload: { exerciseWorkoutId: exercise.id },
-                });
+                deleteExercise(exercise.id);
               }}
               onChange={(sets) => {
-                dispatchWorkout({
-                  type: "UPDATE_EXERCISE",
-                  payload: {
-                    exerciseWorkoutId: exercise.id,
-                    sets,
-                  },
-                });
+                updateExercise(exercise.id, sets);
               }}
             />
           ))}
