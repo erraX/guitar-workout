@@ -1,5 +1,6 @@
 import { ExerciseSet } from "@/types";
 import { createEmptySet } from "@/utils/create-empty-set";
+import { NumberInput } from "@/components/NumberInput";
 import {
   Button,
   Card,
@@ -9,7 +10,6 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -155,7 +155,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
           )}
         </CardHeader>
         <CardBody>
-          <Table aria-label="exercise-table" className="mb-3">
+          <Table
+            aria-label="exercise-table"
+            className="mb-3"
+            onCellAction={(event) => {
+              console.log("on cell action", event);
+            }}
+            onRowAction={(event) => {
+              console.log("on row action", event);
+            }}
+          >
             <TableHeader>
               <TableColumn width={20}>SET</TableColumn>
               <TableColumn width={200}>BPM</TableColumn>
@@ -170,21 +179,21 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                     {set.isFinished ? (
                       set.bpm
                     ) : (
-                      <Input
+                      <NumberInput
                         aria-label="bpm"
                         type="text"
                         size="sm"
                         classNames={{
                           inputWrapper: "h-7",
                         }}
-                        value={set.bpm}
-                        onChange={(event) => {
+                        value={Number(set.bpm)}
+                        onChange={(value) => {
                           onChange?.(
                             produceSets(sets, {
                               type: "UPDATE_BPM",
                               payload: {
                                 id: set.id,
-                                bpm: event.target.value,
+                                bpm: String(value),
                               },
                             })
                           );
@@ -196,21 +205,21 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
                     {set.isFinished ? (
                       set.duration
                     ) : (
-                      <Input
+                      <NumberInput
                         aria-label="duration"
                         type="text"
                         size="sm"
                         classNames={{
                           inputWrapper: "h-7",
                         }}
-                        value={set.duration}
-                        onChange={(event) => {
+                        value={Number(set.duration)}
+                        onChange={(value) => {
                           onChange?.(
                             produceSets(sets, {
                               type: "UPDATE_DURATION",
                               payload: {
                                 id: set.id,
-                                duration: event.target.value,
+                                duration: String(value),
                               },
                             })
                           );

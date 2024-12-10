@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Exercise } from "@prisma/client";
-import { useDisclosure } from "@nextui-org/react";
+import { Button, useDisclosure } from "@nextui-org/react";
 
 import { createWorkout } from "@/actions/workout";
 
 import { AddExercise } from "@/components/AddExercise";
 import { ExerciseCard } from "@/components/ExerciseCard";
+import { NumberInput } from "@/components/NumberInput/NumberInput";
 
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import { useWorkoutsStore } from "@/hooks/useWorkoutsStore";
@@ -62,9 +63,20 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
   useBeforeUnload(isRunning);
   useClearQueryParams();
 
+  const [num, setNum] = useState<number | undefined | null>(10);
+
   return (
     <>
       <div className="flex flex-col items-center w-full">
+        <div>Num: {num}</div>
+        <NumberInput
+          value={num}
+          max={50}
+          onChange={(value) => {
+            console.log("set num value", value);
+            setNum(value);
+          }}
+        />
         <div className="flex justify-center items-center mb-6 w-full">
           <StopWatch
             time={time}
@@ -73,7 +85,7 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
             onStart={start}
           />
         </div>
-        <div className="flex flex-col w-full mb-6">
+        <div className="flex flex-row w-full mb-6 justify-center">
           <AddExercise
             exercises={exercises}
             onAddExercises={(exerciseIds) => {
@@ -82,6 +94,14 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
               });
             }}
           />
+          <Button
+            className="ml-3"
+            onClick={() => {
+              reset();
+            }}
+          >
+            Reset
+          </Button>
         </div>
         <div className="w-full max-w-3xl">
           {workout.exercises.map((exercise) => (
