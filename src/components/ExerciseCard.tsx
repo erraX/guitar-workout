@@ -1,6 +1,7 @@
 import { ExerciseSet } from "@/types";
 import { createEmptySet } from "@/utils/create-empty-set";
 import { NumberInput } from "@/components/NumberInput";
+import { Table } from "@/components/Table";
 import {
   Button,
   Card,
@@ -15,12 +16,6 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
   useDisclosure,
 } from "@nextui-org/react";
 import {
@@ -158,162 +153,131 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
           <Table
             aria-label="exercise-table"
             className="mb-3"
-            onCellAction={(event) => {
-              console.log("on cell action", event);
-            }}
-            onRowAction={(event) => {
-              console.log("on row action", event);
-            }}
-          >
-            <TableHeader>
-              <TableColumn width={20}>SET</TableColumn>
-              <TableColumn width={200}>BPM</TableColumn>
-              <TableColumn width={200}>DURATION(s)</TableColumn>
-              <TableColumn width={20}>ACTIONS</TableColumn>
-            </TableHeader>
-            <TableBody>
-              {(sets || []).map((set, index) => (
-                <TableRow key={set.id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>
-                    {set.isFinished ? (
-                      set.bpm
-                    ) : (
-                      <NumberInput
-                        aria-label="bpm"
-                        type="text"
-                        size="sm"
-                        classNames={{
-                          inputWrapper: "h-7",
-                        }}
-                        value={Number(set.bpm)}
-                        onChange={(value) => {
+            columns={[
+              {
+                key: "setNo",
+                label: "SET",
+                width: 20,
+              },
+              {
+                key: "bpm",
+                label: "BPM",
+                width: 200,
+                renderCell: (row) => {
+                  return row.isFinished ? (
+                    row.bpm
+                  ) : (
+                    <NumberInput
+                      aria-label="bpm"
+                      type="text"
+                      size="sm"
+                      classNames={{
+                        inputWrapper: "h-7",
+                      }}
+                      value={Number(row.bpm)}
+                      onChange={(value) => {
+                        onChange?.(
+                          produceSets(sets, {
+                            type: "UPDATE_BPM",
+                            payload: {
+                              id: row.id,
+                              bpm: String(value),
+                            },
+                          })
+                        );
+                      }}
+                    />
+                  );
+                },
+              },
+              {
+                key: "duration",
+                label: "DURATION(s)",
+                width: 200,
+                renderCell: (row) => {
+                  return row.isFinished ? (
+                    row.duration
+                  ) : (
+                    <NumberInput
+                      aria-label="bpm"
+                      type="text"
+                      size="sm"
+                      classNames={{
+                        inputWrapper: "h-7",
+                      }}
+                      value={Number(row.duration)}
+                      onChange={(value) => {
+                        onChange?.(
+                          produceSets(sets, {
+                            type: "UPDATE_DURATION",
+                            payload: {
+                              id: row.id,
+                              duration: String(value),
+                            },
+                          })
+                        );
+                      }}
+                    />
+                  );
+                },
+              },
+              {
+                key: "actions",
+                label: "ACTIONS",
+                width: 20,
+                renderCell: (row) => {
+                  return (
+                    <div>
+                      <MarkSetFinishedButton
+                        isFinished={row.isFinished}
+                        onFinished={() => {
                           onChange?.(
                             produceSets(sets, {
-                              type: "UPDATE_BPM",
-                              payload: {
-                                id: set.id,
-                                bpm: String(value),
-                              },
+                              type: "TOGGLE_FINISHED",
+                              payload: { id: row.id, isFinished: true },
+                            })
+                          );
+                        }}
+                        onUnfinished={() => {
+                          onChange?.(
+                            produceSets(sets, {
+                              type: "TOGGLE_FINISHED",
+                              payload: { id: row.id, isFinished: false },
                             })
                           );
                         }}
                       />
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {set.isFinished ? (
-                      set.duration
-                    ) : (
-                      <NumberInput
-                        aria-label="duration"
-                        type="text"
-                        size="sm"
-                        classNames={{
-                          inputWrapper: "h-7",
-                        }}
-                        value={Number(set.duration)}
-                        onChange={(value) => {
+                      <SetToolButtons
+                        onDelete={() => {
                           onChange?.(
                             produceSets(sets, {
-                              type: "UPDATE_DURATION",
-                              payload: {
-                                id: set.id,
-                                duration: String(value),
-                              },
+                              type: "DELETE",
+                              payload: { id: row.id },
+                            })
+                          );
+                        }}
+                        onDuplicate={() => {
+                          onChange?.(
+                            produceSets(sets, {
+                              type: "ADD",
+                              payload: { set: row },
                             })
                           );
                         }}
                       />
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {set.isFinished ? (
-                      <Button
-                        isIconOnly
-                        color="success"
-                        size="sm"
-                        onClick={() => {
-                          onChange?.(
-                            produceSets(sets, {
-                              type: "TOGGLE_FINISHED",
-                              payload: {
-                                id: set.id,
-                                isFinished: false,
-                              },
-                            })
-                          );
-                        }}
-                      >
-                        <RiCheckboxLine color="white" size="18" />
-                      </Button>
-                    ) : (
-                      <Button
-                        isIconOnly
-                        size="sm"
-                        onClick={() => {
-                          onChange?.(
-                            produceSets(sets, {
-                              type: "TOGGLE_FINISHED",
-                              payload: {
-                                id: set.id,
-                                isFinished: true,
-                              },
-                            })
-                          );
-                        }}
-                      >
-                        <RiCheckboxBlankLine color="white" size="18" />
-                      </Button>
-                    )}
-                    <Dropdown>
-                      <DropdownTrigger>
-                        <Button isIconOnly className="ml-2" size="sm">
-                          <RiSettings2Line size="18" color="white" />
-                        </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        onAction={(key) => {
-                          if (key === "delete") {
-                            onChange?.(
-                              produceSets(sets, {
-                                type: "DELETE",
-                                payload: {
-                                  id: set.id,
-                                },
-                              })
-                            );
-                            return;
-                          }
-
-                          if (key === "duplicate") {
-                            onChange?.(
-                              produceSets(sets, {
-                                type: "ADD",
-                                payload: {
-                                  set,
-                                },
-                              })
-                            );
-                            return;
-                          }
-                        }}
-                      >
-                        <DropdownItem
-                          key="delete"
-                          className="text-danger"
-                          color="danger"
-                        >
-                          Delete
-                        </DropdownItem>
-                        <DropdownItem key="duplicate">Duplicate</DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    </div>
+                  );
+                },
+              },
+            ]}
+            rows={sets.map((set, index) => ({
+              id: set.id,
+              setNo: index + 1,
+              bpm: set.bpm,
+              duration: set.duration,
+              isFinished: set.isFinished,
+            }))}
+          />
           <div className="flex">
             <Button
               className="flex-1"
@@ -378,3 +342,59 @@ export const ExerciseCard: FC<ExerciseCardProps> = ({
     </>
   );
 };
+
+function MarkSetFinishedButton({
+  isFinished,
+  onFinished,
+  onUnfinished,
+}: {
+  isFinished: boolean;
+  onFinished: () => void;
+  onUnfinished: () => void;
+}) {
+  return isFinished ? (
+    <Button isIconOnly color="success" size="sm" onClick={onUnfinished}>
+      <RiCheckboxLine color="white" size="18" />
+    </Button>
+  ) : (
+    <Button isIconOnly size="sm" onClick={onFinished}>
+      <RiCheckboxBlankLine color="white" size="18" />
+    </Button>
+  );
+}
+
+function SetToolButtons({
+  onDelete,
+  onDuplicate,
+}: {
+  onDelete: () => void;
+  onDuplicate: () => void;
+}) {
+  return (
+    <Dropdown>
+      <DropdownTrigger>
+        <Button isIconOnly className="ml-2" size="sm">
+          <RiSettings2Line size="18" color="white" />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu
+        onAction={(key) => {
+          if (key === "delete") {
+            onDelete();
+            return;
+          }
+
+          if (key === "duplicate") {
+            onDuplicate();
+            return;
+          }
+        }}
+      >
+        <DropdownItem key="delete" className="text-danger" color="danger">
+          Delete
+        </DropdownItem>
+        <DropdownItem key="duplicate">Duplicate</DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  );
+}

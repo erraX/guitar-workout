@@ -9,7 +9,6 @@ import { createWorkout } from "@/actions/workout";
 
 import { AddExercise } from "@/components/AddExercise";
 import { ExerciseCard } from "@/components/ExerciseCard";
-import { NumberInput } from "@/components/NumberInput/NumberInput";
 
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 import { useWorkoutsStore } from "@/hooks/useWorkoutsStore";
@@ -68,15 +67,6 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
   return (
     <>
       <div className="flex flex-col items-center w-full">
-        <div>Num: {num}</div>
-        <NumberInput
-          value={num}
-          max={50}
-          onChange={(value) => {
-            console.log("set num value", value);
-            setNum(value);
-          }}
-        />
         <div className="flex justify-center items-center mb-6 w-full">
           <StopWatch
             time={time}
