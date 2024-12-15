@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { ExerciseSet } from "@/types";
 import { createEmptySet } from "@/utils/create-empty-set";
 import { NumberInput } from "@/components/NumberInput";
@@ -119,335 +119,341 @@ const produceSets = (sets: ExerciseSet[], { type, payload }: ProducerType) =>
     }
   });
 
-export const ExerciseCard: FC<ExerciseCardProps> = memo(
-  function ExerciseCard({
-    className,
-    title,
-    id,
-    sets,
-    enableUndoRedo = false,
+export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
+  className,
+  title,
+  id,
+  sets,
+  enableUndoRedo = false,
 
-    onExerciseDeleted,
-    onChange,
+  onExerciseDeleted,
+  onChange,
 
-    onUndo,
-    onRedo,
-  }) {
-    const [curTrainSet, setCurTrainSet] = useState<ExerciseSetRow | null>(null);
-    const confirmDeleteModal = useDisclosure();
-    const timerModal = useDisclosure();
+  onUndo,
+  onRedo,
+}) {
+  const [curTrainSet, setCurTrainSet] = useState<ExerciseSetRow | null>(null);
+  const confirmDeleteModal = useDisclosure();
+  const timerModal = useDisclosure();
+  const setsRef = useRef(sets);
+  setsRef.current = sets;
 
-    const numInputClassNames = useMemo(
-      () => ({
-        inputWrapper: "h-7",
-      }),
-      []
+  const numInputClassNames = useMemo(
+    () => ({
+      inputWrapper: "h-7",
+    }),
+    []
+  );
+
+  const addSet = useCallback(() => {
+    onChange?.(
+      id,
+      produceSets(setsRef.current, {
+        type: "ADD",
+        payload: { set: setsRef.current[setsRef.current.length - 1] },
+      })
     );
+  }, [onChange, id]);
 
-    const addSet = useCallback(() => {
-      onChange?.(
-        id,
-        produceSets(sets, {
-          type: "ADD",
-          payload: { set: sets[sets.length - 1] },
-        })
-      );
-    }, [sets, onChange, id]);
+  const completeAll = useCallback(() => {
+    onChange?.(id, produceSets(setsRef.current, { type: "FINISH_ALL" }));
+  }, [onChange, id]);
 
-    const completeAll = useCallback(() => {
-      onChange?.(id, produceSets(sets, { type: "FINISH_ALL" }));
-    }, [sets, onChange, id]);
-
-    return (
-      <>
-        <Card className={className}>
-          <CardHeader>
-            <span className="flex-1 font-medium text-sm">{title}</span>
+  return (
+    <>
+      <Card className={className}>
+        <CardHeader>
+          <span className="flex-1 font-medium text-sm">{title}</span>
+          <Button
+            isIconOnly
+            className="ml-2"
+            color="danger"
+            size="sm"
+            onClick={confirmDeleteModal.onOpen}
+          >
+            <RiDeleteBinLine size="18" />
+          </Button>
+          {enableUndoRedo && (
             <Button
               isIconOnly
               className="ml-2"
-              color="danger"
+              color="warning"
               size="sm"
-              onClick={() => {
-                confirmDeleteModal.onOpen();
-                onExerciseDeleted?.(id);
-              }}
+              onClick={onUndo}
             >
-              <RiDeleteBinLine size="18" />
+              <RiArrowGoBackLine size="18" color="white" />
             </Button>
-            {enableUndoRedo && (
-              <Button
-                isIconOnly
-                className="ml-2"
-                color="warning"
-                size="sm"
-                onClick={onUndo}
-              >
-                <RiArrowGoBackLine size="18" color="white" />
-              </Button>
-            )}
-            {enableUndoRedo && (
-              <Button
-                isIconOnly
-                className="ml-2"
-                color="warning"
-                size="sm"
-                onClick={onRedo}
-              >
-                <RiArrowGoForwardLine size="18" color="white" />
-              </Button>
-            )}
-          </CardHeader>
-          <CardBody>
-            <NativeTable
-              aria-label="exercise-table"
-              className="mb-3"
-              columns={[
-                {
-                  key: "setNo",
-                  label: "SET",
-                  width: 20,
+          )}
+          {enableUndoRedo && (
+            <Button
+              isIconOnly
+              className="ml-2"
+              color="warning"
+              size="sm"
+              onClick={onRedo}
+            >
+              <RiArrowGoForwardLine size="18" color="white" />
+            </Button>
+          )}
+        </CardHeader>
+        <CardBody>
+          <NativeTable
+            aria-label="exercise-table"
+            className="mb-3"
+            columns={[
+              {
+                key: "setNo",
+                label: "SET",
+                width: 20,
+              },
+              {
+                key: "isFinished",
+                label: "",
+                width: 20,
+                renderCell: (row) => {
+                  return (
+                    <MarkSetFinishedButton
+                      className="ml-2"
+                      isFinished={row.isFinished}
+                      onFinished={() => {
+                        onChange?.(
+                          id,
+                          produceSets(sets, {
+                            type: "TOGGLE_FINISHED",
+                            payload: { id: row.id, isFinished: true },
+                          })
+                        );
+                      }}
+                      onUnfinished={() => {
+                        onChange?.(
+                          id,
+                          produceSets(sets, {
+                            type: "TOGGLE_FINISHED",
+                            payload: { id: row.id, isFinished: false },
+                          })
+                        );
+                      }}
+                    />
+                  );
                 },
-                {
-                  key: "bpm",
-                  label: "BPM",
-                  width: 120,
-                  renderCell: (row) => {
-                    return row.isFinished ? (
-                      row.bpm
-                    ) : (
-                      <NumberInput
-                        aria-label="bpm"
-                        type="text"
+              },
+              {
+                key: "bpm",
+                label: "BPM",
+                width: 250,
+                renderCell: (row) => {
+                  return row.isFinished ? (
+                    row.bpm
+                  ) : (
+                    <NumberInput
+                      aria-label="bpm"
+                      type="text"
+                      size="sm"
+                      classNames={numInputClassNames}
+                      value={Number(row.bpm)}
+                      onChange={(value) => {
+                        onChange?.(
+                          id,
+                          produceSets(sets, {
+                            type: "UPDATE_BPM",
+                            payload: {
+                              id: row.id,
+                              bpm: String(value),
+                            },
+                          })
+                        );
+                      }}
+                    />
+                  );
+                },
+              },
+              {
+                key: "duration",
+                label: "DURATION",
+                width: 250,
+                renderCell: (row) => {
+                  return row.isFinished ? (
+                    row.duration
+                  ) : (
+                    <NumberInput
+                      aria-label="bpm"
+                      type="text"
+                      size="sm"
+                      classNames={numInputClassNames}
+                      value={Number(row.duration)}
+                      onChange={(value) => {
+                        onChange?.(
+                          id,
+                          produceSets(sets, {
+                            type: "UPDATE_DURATION",
+                            payload: {
+                              id: row.id,
+                              duration: String(value),
+                            },
+                          })
+                        );
+                      }}
+                    />
+                  );
+                },
+              },
+              {
+                key: "actions",
+                label: "ACTIONS",
+                width: 200,
+                renderCell: (row) => {
+                  return (
+                    <div>
+                      <Button
+                        isIconOnly
+                        color="success"
                         size="sm"
-                        classNames={numInputClassNames}
-                        value={Number(row.bpm)}
-                        onChange={(value) => {
+                        isDisabled={row.isFinished}
+                        onClick={() => {
+                          setCurTrainSet(row as ExerciseSetRow);
+                          timerModal.onOpen();
+                        }}
+                      >
+                        <RiPlayCircleLine size="18" color="white" />
+                      </Button>
+                      <Button
+                        isIconOnly
+                        className="ml-2"
+                        color="danger"
+                        size="sm"
+                        onClick={() => {
                           onChange?.(
                             id,
                             produceSets(sets, {
-                              type: "UPDATE_BPM",
-                              payload: {
-                                id: row.id,
-                                bpm: String(value),
-                              },
+                              type: "DELETE",
+                              payload: { id: row.id },
                             })
                           );
                         }}
-                      />
-                    );
-                  },
-                },
-                {
-                  key: "duration",
-                  label: "DURATION",
-                  width: 120,
-                  renderCell: (row) => {
-                    return row.isFinished ? (
-                      row.duration
-                    ) : (
-                      <NumberInput
-                        aria-label="bpm"
-                        type="text"
-                        size="sm"
-                        classNames={numInputClassNames}
-                        value={Number(row.duration)}
-                        onChange={(value) => {
+                      >
+                        <RiDeleteBinLine size="18" color="white" />
+                      </Button>
+                      <SetToolButtons
+                        onDelete={() => {
                           onChange?.(
                             id,
                             produceSets(sets, {
-                              type: "UPDATE_DURATION",
-                              payload: {
-                                id: row.id,
-                                duration: String(value),
-                              },
+                              type: "DELETE",
+                              payload: { id: row.id },
                             })
                           );
                         }}
-                      />
-                    );
-                  },
-                },
-                {
-                  key: "actions",
-                  label: "ACTIONS",
-                  width: 80,
-                  renderCell: (row) => {
-                    return (
-                      <div>
-                        <Button
-                          isIconOnly
-                          color="success"
-                          size="sm"
-                          isDisabled={row.isFinished}
-                          onClick={() => {
-                            setCurTrainSet(row as ExerciseSetRow);
-                            timerModal.onOpen();
-                          }}
-                        >
-                          <RiPlayCircleLine size="18" color="white" />
-                        </Button>
-                        <MarkSetFinishedButton
-                          className="ml-2"
-                          isFinished={row.isFinished}
-                          onFinished={() => {
-                            onChange?.(
-                              id,
-                              produceSets(sets, {
-                                type: "TOGGLE_FINISHED",
-                                payload: { id: row.id, isFinished: true },
-                              })
-                            );
-                          }}
-                          onUnfinished={() => {
-                            onChange?.(
-                              id,
-                              produceSets(sets, {
-                                type: "TOGGLE_FINISHED",
-                                payload: { id: row.id, isFinished: false },
-                              })
-                            );
-                          }}
-                        />
-                        <Button
-                          isIconOnly
-                          className="ml-2"
-                          color="danger"
-                          size="sm"
-                          onClick={() => {
-                            onChange?.(
-                              id,
-                              produceSets(sets, {
-                                type: "DELETE",
-                                payload: { id: row.id },
-                              })
-                            );
-                          }}
-                        >
-                          <RiDeleteBinLine size="18" color="white" />
-                        </Button>
-                        <SetToolButtons
-                          onDelete={() => {
-                            onChange?.(
-                              id,
-                              produceSets(sets, {
-                                type: "DELETE",
-                                payload: { id: row.id },
-                              })
-                            );
-                          }}
-                          onDuplicate={() => {
-                            onChange?.(
-                              id,
-                              produceSets(sets, {
-                                type: "ADD",
-                                payload: {
-                                  set: {
-                                    id: row.id + "_1",
-                                    bpm: row.bpm,
-                                    duration: row.duration,
-                                    isFinished: row.isFinished,
-                                  },
+                        onDuplicate={() => {
+                          onChange?.(
+                            id,
+                            produceSets(sets, {
+                              type: "ADD",
+                              payload: {
+                                set: {
+                                  id: row.id + "_1",
+                                  bpm: row.bpm,
+                                  duration: row.duration,
+                                  isFinished: row.isFinished,
                                 },
-                              })
-                            );
-                          }}
-                        />
-                      </div>
-                    );
-                  },
+                              },
+                            })
+                          );
+                        }}
+                      />
+                    </div>
+                  );
                 },
-              ]}
-              rows={sets.map(
-                (set, index) =>
-                  ({
-                    id: set.id,
-                    setNo: index + 1,
-                    bpm: set.bpm,
-                    duration: set.duration,
-                    isFinished: set.isFinished,
-                  } as ExerciseSetRow)
-              )}
-            />
-            <div className="flex mt-3">
-              <Button
-                className="flex-1"
-                variant="flat"
-                size="sm"
-                onClick={addSet}
-              >
-                Add Set
-              </Button>
-              <Button
-                className="flex-1 ml-3"
-                variant="flat"
-                size="sm"
-                color="danger"
-                onClick={completeAll}
-              >
-                Complete All
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
-        <Modal
-          isOpen={confirmDeleteModal.isOpen}
-          onOpenChange={confirmDeleteModal.onOpenChange}
-        >
-          <ModalContent>
-            {(onClose) => (
-              <>
-                <ModalHeader className="flex flex-col gap-1">
-                  Delete exercise?
-                </ModalHeader>
-                <ModalBody>
-                  <p>This will delete "{title}"</p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button variant="light" onPress={onClose}>
-                    Cancel
-                  </Button>
-                  <Button
-                    color="danger"
-                    onPress={() => {
-                      onExerciseDeleted?.(id);
-                      onClose();
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </ModalFooter>
-              </>
+              },
+            ]}
+            rows={sets.map(
+              (set, index) =>
+                ({
+                  id: set.id,
+                  setNo: index + 1,
+                  bpm: set.bpm,
+                  duration: set.duration,
+                  isFinished: set.isFinished,
+                } as ExerciseSetRow)
             )}
-          </ModalContent>
-        </Modal>
-        <Modal
-          size="full"
-          hideCloseButton
-          isOpen={timerModal.isOpen}
-          onOpenChange={timerModal.onOpenChange}
-        >
-          <ModalContent>
-            <Trainer
-              exerciseName={title}
-              set={curTrainSet}
-              onEnd={(setId, duration) => {
-                onChange?.(
-                  id,
-                  produceSets(sets, {
-                    type: "FINISH_TRAIN_SET",
-                    payload: { id: setId, duration, isFinished: true },
-                  })
-                );
-              }}
-              onClose={timerModal.onClose}
-            />
-          </ModalContent>
-        </Modal>
-      </>
-    );
-  }
-);
+          />
+          <div className="flex mt-3">
+            <Button
+              className="flex-1"
+              variant="flat"
+              size="sm"
+              onClick={addSet}
+            >
+              Add Set
+            </Button>
+            <Button
+              className="flex-1 ml-3"
+              variant="flat"
+              size="sm"
+              color="danger"
+              onClick={completeAll}
+            >
+              Complete All
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
+      <Modal
+        isOpen={confirmDeleteModal.isOpen}
+        onOpenChange={confirmDeleteModal.onOpenChange}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Delete exercise?
+              </ModalHeader>
+              <ModalBody>
+                <p>This will delete &quot;{title}&quot;</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={() => {
+                    onExerciseDeleted?.(id);
+                    onClose();
+                  }}
+                >
+                  Delete
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        size="full"
+        hideCloseButton
+        isOpen={timerModal.isOpen}
+        onOpenChange={timerModal.onOpenChange}
+      >
+        <ModalContent>
+          <Trainer
+            exerciseName={title}
+            set={curTrainSet}
+            onEnd={(setId, duration) => {
+              onChange?.(
+                id,
+                produceSets(sets, {
+                  type: "FINISH_TRAIN_SET",
+                  payload: { id: setId, duration, isFinished: true },
+                })
+              );
+            }}
+            onClose={timerModal.onClose}
+          />
+        </ModalContent>
+      </Modal>
+    </>
+  );
+});
 
 const MarkSetFinishedButton = memo(function MarkSetFinishedButton({
   className,
