@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Input, InputProps } from "@nextui-org/react";
 
 type NumberInputValue = number | null | undefined;
@@ -11,7 +12,7 @@ export interface NumberInputProps
   max?: number;
 }
 
-export function NumberInput({
+export const NumberInput = memo(function NumberInput({
   onChange,
   defaultValue,
   value,
@@ -26,6 +27,7 @@ export function NumberInput({
 
   return (
     <Input
+      isClearable
       value={numValue}
       defaultValue={numDefaultValue}
       onKeyDown={(event) => {
@@ -65,6 +67,9 @@ export function NumberInput({
 
         event.preventDefault();
       }}
+      onClear={() => {
+        onChange?.(null);
+      }}
       onChange={(event) => {
         const value = event.target.value;
 
@@ -75,7 +80,7 @@ export function NumberInput({
       {...props}
     />
   );
-}
+});
 
 function ensureNumberRange<T extends number | undefined | null>(
   num: T,

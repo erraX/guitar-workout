@@ -18,6 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
+      </head>
       <body>
         <Providers>
           <div className="max-w-page min-w-page m-auto">

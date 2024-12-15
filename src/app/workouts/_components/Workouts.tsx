@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Exercise } from "@prisma/client";
 import { Button, useDisclosure } from "@nextui-org/react";
@@ -39,7 +39,7 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
 
   const { isRunning, time, start, abort, stop } = useWorkoutTaskState();
 
-  const handleStop = async () => {
+  const handleStop = useCallback(async () => {
     stop();
 
     const result = await createWorkout({
@@ -57,12 +57,25 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
     if (!result.success) {
       console.log("create workout error", result.error);
     }
-  };
+  }, [workout, stop]);
+
+  // Inside the Workouts component:
+  const handleUpdateExercise = useCallback(
+    (id: string, sets: any) => {
+      updateExercise(id, sets);
+    },
+    [updateExercise]
+  );
+
+  const handleDeleteExercise = useCallback(
+    (id: string) => {
+      deleteExercise(id);
+    },
+    [deleteExercise]
+  );
 
   useBeforeUnload(isRunning);
   useClearQueryParams();
-
-  const [num, setNum] = useState<number | undefined | null>(10);
 
   return (
     <>
@@ -97,15 +110,12 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
           {workout.exercises.map((exercise) => (
             <ExerciseCard
               key={exercise.id}
+              id={exercise.id}
               className="mb-3"
               title={getExerciseNameById(exercises, exercise.exerciseId)}
               sets={exercise.sets}
-              onExerciseDeleted={() => {
-                deleteExercise(exercise.id);
-              }}
-              onChange={(sets) => {
-                updateExercise(exercise.id, sets);
-              }}
+              onExerciseDeleted={handleDeleteExercise}
+              onChange={handleUpdateExercise}
             />
           ))}
         </div>
