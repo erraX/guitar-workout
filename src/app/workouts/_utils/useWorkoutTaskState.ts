@@ -1,9 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStopWatch } from "@/hooks/useStopWatch";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export function useWorkoutTaskState() {
   const runningState = useRunningState();
   const stopWatch = useStopWatch();
+
+  const [runningStateLS, setRunningStateLS] = useLocalStorage<RunningState>(
+    "exercise_running_state",
+    "IDLE"
+  );
+  const [stopWatchTimeLS, setStopWatchTimeLS] = useLocalStorage(
+    "exercise_stopwatch_time",
+    0
+  );
 
   const start = () => {
     runningState.start();
@@ -19,6 +29,26 @@ export function useWorkoutTaskState() {
     runningState.stop();
     stopWatch.stop();
   };
+
+  useEffect(() => {
+    if (runningStateLS === "RUNNING") {
+      runningState.init({
+        state: "RUNNING",
+      });
+      stopWatch.init({
+        time: stopWatchTimeLS,
+        isRunning: true,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    setStopWatchTimeLS(stopWatch.time);
+  }, [setStopWatchTimeLS, stopWatch.time]);
+
+  useEffect(() => {
+    setRunningStateLS(runningState.state);
+  }, [setRunningStateLS, runningState.state]);
 
   return {
     runningState: runningState.state,
@@ -45,5 +75,11 @@ function useRunningState() {
   const pause = () => setState("PAUSED");
   const stop = () => setState("IDLE");
 
-  return { state, isIdle, isRunning, isPaused, start, pause, stop };
+  const init = ({ state }: { state?: RunningState }) => {
+    if (typeof state !== "undefined") {
+      setState(state);
+    }
+  };
+
+  return { state, isIdle, isRunning, isPaused, start, pause, stop, init };
 }

@@ -61,7 +61,7 @@ export function Trainer({
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <div className="text-2xl mb-3">
-        {exerciseName} | No.{set?.setNo}
+        {exerciseName} | Set No.{set?.setNo}
       </div>
       {set?.duration && (
         <Code
@@ -84,9 +84,9 @@ export function Trainer({
             Start
           </Button>
         )}
-      </div>
-      <div className="mt-3">
-        <Button onClick={onClose}>Close</Button>
+        <Button className="ml-3" onClick={onClose}>
+          Cancel
+        </Button>
       </div>
     </div>
   );

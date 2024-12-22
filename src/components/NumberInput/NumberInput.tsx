@@ -32,17 +32,28 @@ export const NumberInput = memo(function NumberInput({
       defaultValue={numDefaultValue}
       onKeyDown={(event) => {
         // Skip if meta, ctrl, or alt is pressed
-        if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+        if (
+          event.metaKey ||
+          event.ctrlKey ||
+          event.altKey ||
+          (event.shiftKey &&
+            event.key !== "ArrowUp" &&
+            event.key !== "ArrowDown")
+        ) {
           return;
         }
 
-        const curValue = Number(value ?? 0);
+        const curValue = Number(value || 0);
         if (event.key === "ArrowUp") {
-          const nextValue = ensureNumberRange(curValue + 1, min, max);
+          const nextValue = event.shiftKey
+            ? ensureNumberRange(curValue + 5, min, max)
+            : ensureNumberRange(curValue + 1, min, max);
           onChange?.(nextValue);
           return;
         } else if (event.key === "ArrowDown") {
-          const nextValue = ensureNumberRange(curValue - 1, min, max);
+          const nextValue = event.shiftKey
+            ? ensureNumberRange(curValue - 5, min, max)
+            : ensureNumberRange(curValue - 1, min, max);
           onChange?.(nextValue);
           return;
         }

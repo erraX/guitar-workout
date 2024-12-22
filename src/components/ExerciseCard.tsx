@@ -249,6 +249,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
                       aria-label="bpm"
                       type="text"
                       size="sm"
+                      min={0}
                       classNames={numInputClassNames}
                       value={Number(row.bpm)}
                       onChange={(value) => {
@@ -279,6 +280,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
                       aria-label="bpm"
                       type="text"
                       size="sm"
+                      min={0}
                       classNames={numInputClassNames}
                       value={Number(row.duration)}
                       onChange={(value) => {

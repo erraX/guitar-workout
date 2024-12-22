@@ -7,7 +7,7 @@ export const useStopWatch = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       if (isRunning) {
-        setTime(time => time + 1);
+        setTime((time) => time + 1);
       }
     }, 1000);
 
@@ -25,9 +25,25 @@ export const useStopWatch = () => {
     setIsRunning(false);
   };
 
+  const init = ({
+    time,
+    isRunning,
+  }: {
+    time?: number;
+    isRunning?: boolean;
+  }) => {
+    if (typeof time !== "undefined") {
+      setTime(time);
+    }
+    if (typeof isRunning !== "undefined") {
+      setIsRunning(isRunning);
+    }
+  };
+
   return {
     start,
     stop,
     time,
+    init,
   };
 };
