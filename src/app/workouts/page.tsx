@@ -1,12 +1,11 @@
 import { getExercises } from "@/service/exercise";
 import { getWorkoutById } from "@/service/workout";
 import { Workouts } from "./_components/Workouts";
+import { WorkoutsStoreProvider } from "./_contexts/WorkoutsStoreContext";
 
-export default async function WorkoutsPage(
-  props: {
-    searchParams: Promise<{ workoutId: string }>;
-  }
-) {
+export default async function WorkoutsPage(props: {
+  searchParams: Promise<{ workoutId: string }>;
+}) {
   const searchParams = await props.searchParams;
   const workoutId = Number(searchParams.workoutId);
 
@@ -17,5 +16,9 @@ export default async function WorkoutsPage(
 
   const exercises = await getExercises();
 
-  return <Workouts exercises={exercises} workoutTemplate={workout} />;
+  return (
+    <WorkoutsStoreProvider>
+      <Workouts exercises={exercises} workoutTemplate={workout} />
+    </WorkoutsStoreProvider>
+  );
 }

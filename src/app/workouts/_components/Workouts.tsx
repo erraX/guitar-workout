@@ -8,13 +8,13 @@ import { Button, useDisclosure } from "@nextui-org/react";
 import { createWorkout } from "@/actions/workout";
 
 import { AddExercise } from "@/components/AddExercise";
-import { ExerciseCard } from "@/components/ExerciseCard";
+import { ExerciseCard } from "./ExerciseCard";
 
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
-import { useWorkoutsStore } from "@/hooks/useWorkoutsStore";
 
 import FinishConfirmModal from "./FinishConfirmModal";
 import StopWatch from "./StopWatch";
+import { useWorkoutsStore } from "../_contexts/WorkoutsStoreContext";
 
 import { useWorkoutTaskState } from "../_utils/useWorkoutTaskState";
 
@@ -31,11 +31,14 @@ export interface WorkoutsProps {
   workoutTemplate?: any;
 }
 
+// TODO: workoutTemplate
 export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
   const finishedConfirmModal = useDisclosure();
 
-  const { reset, addExercise, deleteExercise, updateExercise, ...workout } =
-    useWorkoutsStore(workoutTemplate);
+  const reset = useWorkoutsStore((state) => state.reset);
+  const addExercise = useWorkoutsStore((state) => state.addExercise);
+  const duration = useWorkoutsStore((state) => state.duration);
+  const workoutExercises = useWorkoutsStore((state) => state.exercises);
 
   const { isRunning, time, start, abort, stop } = useWorkoutTaskState();
 
@@ -43,9 +46,9 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
     stop();
 
     const result = await createWorkout({
-      duration: workout.duration,
-      exercises: workout.exercises.map((exercise) => ({
-        id: exercise.exerciseId,
+      duration,
+      exercises: workoutExercises.map((exercise) => ({
+        id: Number(exercise.exerciseId),
         sets: exercise.sets
           .filter((set) => set.isFinished)
           .map((set) => ({
@@ -57,22 +60,7 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
     if (!result.success) {
       console.log("create workout error", result.error);
     }
-  }, [workout, stop]);
-
-  // Inside the Workouts component:
-  const handleUpdateExercise = useCallback(
-    (id: string, sets: any) => {
-      updateExercise(id, sets);
-    },
-    [updateExercise]
-  );
-
-  const handleDeleteExercise = useCallback(
-    (id: string) => {
-      deleteExercise(id);
-    },
-    [deleteExercise]
-  );
+  }, [duration, workoutExercises, stop]);
 
   useBeforeUnload(isRunning);
   useClearQueryParams();
@@ -93,7 +81,7 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
             exercises={exercises}
             onAddExercises={(exerciseIds) => {
               exerciseIds.forEach((exerciseId) => {
-                addExercise(Number(exerciseId));
+                addExercise(exerciseId);
               });
             }}
           />
@@ -107,15 +95,16 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
           </Button>
         </div>
         <div className="w-full max-w-3xl">
-          {workout.exercises.map((exercise) => (
+          {workoutExercises.map((exercise) => (
             <ExerciseCard
               key={exercise.id}
               id={exercise.id}
               className="mb-3"
-              title={getExerciseNameById(exercises, exercise.exerciseId)}
+              title={getExerciseNameById(
+                exercises,
+                Number(exercise.exerciseId)
+              )}
               sets={exercise.sets}
-              onExerciseDeleted={handleDeleteExercise}
-              onChange={handleUpdateExercise}
             />
           ))}
         </div>

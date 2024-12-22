@@ -17,7 +17,6 @@ export interface TrainerProps {
   } | null;
 }
 
-// TODO: SPACE shorcuts
 // TODO: count down clock
 export function Trainer({
   exerciseName,

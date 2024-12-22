@@ -7,7 +7,7 @@ export interface ExerciseSet {
 
 export interface ExerciseInWorkout {
   id: string;
-  exerciseId: number;
+  exerciseId: string;
   sets: ExerciseSet[];
 }
 
