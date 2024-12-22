@@ -1,12 +1,13 @@
 import { produce } from "immer";
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
 import { createEmptySet } from "@/utils/create-empty-set";
 import type { Workout, ExerciseSet } from "@/types";
 
 type WorkoutsStoreActions = {
-  initialize: (state: Workout) => void;
-  reset: () => void;
+  reset: (nextState: Omit<Workout, "id">) => void;
+  clear: () => void;
 
   addExercise: (exerciseId: string) => void;
   deleteExercise: (exerciseWorkoutId: string) => void;
@@ -35,138 +36,146 @@ type WorkoutsStoreActions = {
 
 export type WorkoutsStoreState = Workout & WorkoutsStoreActions;
 
-const createInitialState = (): Omit<Workout, "id"> => ({
-  name: "Default",
-  duration: 0,
-  exercises: [],
-});
+export const createWorkoutsStore = () =>
+  create(
+    persist<WorkoutsStoreState>(
+      (set) => ({
+        id: uuidv4(),
+        name: "Default",
+        duration: 0,
+        exercises: [],
 
-export const createWorkoutsStore = (
-  initialState: Omit<Workout, "id"> = createInitialState()
-) =>
-  create<WorkoutsStoreState>((set) => ({
-    id: uuidv4(),
+        reset: (nextState) => set({ ...nextState }),
 
-    ...initialState,
+        clear: () =>
+          set({
+            name: "Default",
+            duration: 0,
+            exercises: [],
+          }),
 
-    initialize: (state: Workout) => set({ ...state }),
-
-    reset: () => set({ ...initialState }),
-
-    addExercise: (exerciseId) =>
-      set((state) => ({
-        exercises: [
-          ...state.exercises,
-          {
-            id: uuidv4(),
-            exerciseId,
-            sets: [createEmptySet()],
-          },
-        ],
-      })),
-
-    deleteExercise: (exerciseWorkoutId) =>
-      set((state) => ({
-        exercises: state.exercises.filter((e) => e.id !== exerciseWorkoutId),
-      })),
-
-    addSet: (exerciseId, exerciseSet) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            exercise.sets.push(exerciseSet);
-          }
-        })
-      ),
-
-    deleteSet: (exerciseId, setId) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            exercise.sets = exercise.sets.filter((s) => s.id !== setId);
-          }
-        })
-      ),
-
-    updateSet: (exerciseId, setId, exerciseSet) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            const existingSet = exercise.sets.find((s) => s.id === setId);
-            if (existingSet) {
-              Object.assign(existingSet, exerciseSet);
-            }
-          }
-        })
-      ),
-
-    updateSetBpm: (exerciseId, setId, bpm) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            const existingSet = exercise.sets.find((s) => s.id === setId);
-            if (existingSet) {
-              existingSet.bpm = bpm;
-            }
-          }
-        })
-      ),
-
-    updateSetDuration: (exerciseId, setId, duration) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            const existingSet = exercise.sets.find((s) => s.id === setId);
-            if (existingSet) {
-              existingSet.duration = duration;
-            }
-          }
-        })
-      ),
-
-    updateSetIsFinished: (exerciseId, setId, isFinished) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            const existingSet = exercise.sets.find((s) => s.id === setId);
-            if (existingSet) {
-              existingSet.isFinished = isFinished;
-            }
-          }
-        })
-      ),
-
-    completeAllSets: (exerciseId) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            exercise.sets.forEach((s) => (s.isFinished = true));
-          }
-        })
-      ),
-
-    duplicateSet: (exerciseId, setId) =>
-      set(
-        produce<WorkoutsStoreState>((state) => {
-          const exercise = state.exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            const existingSet = exercise.sets.find((s) => s.id === setId);
-            if (existingSet) {
-              exercise.sets.push({
-                ...existingSet,
+        addExercise: (exerciseId) =>
+          set((state) => ({
+            exercises: [
+              ...state.exercises,
+              {
                 id: uuidv4(),
-              });
-            }
-          }
-        })
-      ),
-  }));
+                exerciseId,
+                sets: [createEmptySet()],
+              },
+            ],
+          })),
+
+        deleteExercise: (exerciseWorkoutId) =>
+          set((state) => ({
+            exercises: state.exercises.filter(
+              (e) => e.id !== exerciseWorkoutId
+            ),
+          })),
+
+        addSet: (exerciseId, exerciseSet) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                exercise.sets.push(exerciseSet);
+              }
+            })
+          ),
+
+        deleteSet: (exerciseId, setId) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                exercise.sets = exercise.sets.filter((s) => s.id !== setId);
+              }
+            })
+          ),
+
+        updateSet: (exerciseId, setId, exerciseSet) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                const existingSet = exercise.sets.find((s) => s.id === setId);
+                if (existingSet) {
+                  Object.assign(existingSet, exerciseSet);
+                }
+              }
+            })
+          ),
+
+        updateSetBpm: (exerciseId, setId, bpm) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                const existingSet = exercise.sets.find((s) => s.id === setId);
+                if (existingSet) {
+                  existingSet.bpm = bpm;
+                }
+              }
+            })
+          ),
+
+        updateSetDuration: (exerciseId, setId, duration) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                const existingSet = exercise.sets.find((s) => s.id === setId);
+                if (existingSet) {
+                  existingSet.duration = duration;
+                }
+              }
+            })
+          ),
+
+        updateSetIsFinished: (exerciseId, setId, isFinished) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                const existingSet = exercise.sets.find((s) => s.id === setId);
+                if (existingSet) {
+                  existingSet.isFinished = isFinished;
+                }
+              }
+            })
+          ),
+
+        completeAllSets: (exerciseId) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                exercise.sets.forEach((s) => (s.isFinished = true));
+              }
+            })
+          ),
+
+        duplicateSet: (exerciseId, setId) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                const existingSet = exercise.sets.find((s) => s.id === setId);
+                if (existingSet) {
+                  exercise.sets.push({
+                    ...existingSet,
+                    id: uuidv4(),
+                  });
+                }
+              }
+            })
+          ),
+      }),
+      {
+        name: "workouts",
+        storage: createJSONStorage(() => localStorage),
+      }
+    )
+  );
 
 export type WorkoutsStore = ReturnType<typeof createWorkoutsStore>;

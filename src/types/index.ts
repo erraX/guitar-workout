@@ -17,4 +17,3 @@ export interface Workout {
   duration: number;
   exercises: ExerciseInWorkout[];
 }
-

@@ -28,14 +28,12 @@ const getExerciseNameById = (exercises: Exercise[], id: number) => {
 
 export interface WorkoutsProps {
   exercises: Exercise[];
-  workoutTemplate?: any;
 }
 
-// TODO: workoutTemplate
-export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
+export function Workouts({ exercises }: WorkoutsProps) {
   const finishedConfirmModal = useDisclosure();
 
-  const reset = useWorkoutsStore((state) => state.reset);
+  const clear = useWorkoutsStore((state) => state.clear);
   const addExercise = useWorkoutsStore((state) => state.addExercise);
   const duration = useWorkoutsStore((state) => state.duration);
   const workoutExercises = useWorkoutsStore((state) => state.exercises);
@@ -85,13 +83,8 @@ export function Workouts({ exercises, workoutTemplate = null }: WorkoutsProps) {
               });
             }}
           />
-          <Button
-            className="ml-3"
-            onClick={() => {
-              reset();
-            }}
-          >
-            Reset
+          <Button className="ml-3" onClick={clear}>
+            Clear
           </Button>
         </div>
         <div className="w-full max-w-3xl">

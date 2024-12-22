@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { getExercises } from "@/service/exercise";
 import { getWorkoutById } from "@/service/workout";
 import { Workouts } from "./_components/Workouts";
@@ -17,8 +18,28 @@ export default async function WorkoutsPage(props: {
   const exercises = await getExercises();
 
   return (
-    <WorkoutsStoreProvider>
-      <Workouts exercises={exercises} workoutTemplate={workout} />
+    <WorkoutsStoreProvider
+      initialState={
+        workout
+          ? {
+              name: "",
+              duration: workout?.duration ?? 0,
+              exercises:
+                workout?.exercises?.map((exercise) => ({
+                  id: uuidv4(),
+                  exerciseId: exercise.exercise.id.toString(),
+                  sets: exercise.sets.map((set) => ({
+                    id: set.id.toString(),
+                    bpm: set.bpm.toString(),
+                    duration: set.duration.toString(),
+                    isFinished: false,
+                  })),
+                })) ?? [],
+            }
+          : undefined
+      }
+    >
+      <Workouts exercises={exercises} />
     </WorkoutsStoreProvider>
   );
 }
