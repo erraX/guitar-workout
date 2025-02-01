@@ -2,9 +2,9 @@ import { memo, isValidElement } from "react";
 
 import type { TableProps } from "./NativeTable.types";
 
-export const NativeTable = memo(function NativeTable<
+const _NativeTable = function NativeTable<
   TableRow extends Record<string, any>
->({ columns, rows, className }: TableProps<TableRow>) {
+>({ columns, rows }: TableProps<TableRow>) {
   return (
     <table className="table-fixed border-separate border-spacing-2">
       <thead>
@@ -37,4 +37,7 @@ export const NativeTable = memo(function NativeTable<
       </tbody>
     </table>
   );
-});
+};
+
+export const NativeTable = memo(_NativeTable) as typeof _NativeTable;
+
