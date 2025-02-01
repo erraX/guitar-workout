@@ -43,6 +43,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
   const handleStop = useCallback(async () => {
     stop();
 
+    // TODO: Add loading
     const result = await createWorkout({
       duration,
       exercises: workoutExercises.map((exercise) => ({

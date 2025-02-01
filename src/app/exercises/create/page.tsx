@@ -8,6 +8,7 @@ export default function ExercisesCreationPage() {
   const router = useRouter();
 
   const handleSubmit = async (values: any) => {
+    // TODO: Add loading
     await createExercise(values);
     router.push(`/exercises/`);
   };
