@@ -8,12 +8,16 @@ export interface NumberInputProps
   value?: NumberInputValue;
   defaultValue?: NumberInputValue;
   onChange?: (value: NumberInputValue) => void;
+  onToggleFinished?: () => void;
+  onStart?: () => void;
   min?: number;
   max?: number;
 }
 
 export const NumberInput = memo(function NumberInput({
   onChange,
+  onToggleFinished,
+  onStart,
   defaultValue,
   value,
   min = Number.MIN_SAFE_INTEGER,
@@ -59,7 +63,15 @@ export const NumberInput = memo(function NumberInput({
         }
 
         // Allow: backspace, delete, tab, escape, enter, decimal point
-        const allowedKeys = ["Backspace", "Delete", "Escape", "Enter", "-"];
+        const allowedKeys = [
+          "Backspace",
+          "Delete",
+          "Escape",
+          "Enter",
+          "-",
+          "t", // toggle finished
+          "s", // start
+        ];
         // Allow: navigation keys (home, end, arrows)
         const navigationKeys = ["Home", "End", "ArrowLeft", "ArrowRight"];
 
@@ -68,6 +80,16 @@ export const NumberInput = memo(function NumberInput({
           allowedKeys.includes(event.key) ||
           navigationKeys.includes(event.key)
         ) {
+          if (event.key === "t") {
+            onToggleFinished?.();
+            return;
+          }
+
+          if (event.key === "s") {
+            onStart?.();
+            return;
+          }
+
           return;
         }
 

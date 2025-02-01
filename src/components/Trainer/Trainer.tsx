@@ -66,6 +66,7 @@ export function Trainer({
         <Code
           className="text-2xl mb-3"
           color={
+            // TODO: send notification if time is reached the duration
             Number(clock.time) < Number(set.duration) ? "danger" : "success"
           }
         >
@@ -75,11 +76,27 @@ export function Trainer({
       <Time className="mb-3" seconds={clock.time} />
       <div>
         {isRunning ? (
-          <Button color="danger" onClick={handleEnd}>
+          <Button
+            color="danger"
+            onClick={handleEnd}
+            onKeyDown={(e) => {
+              if (e.key === " ") {
+                handleEnd();
+              }
+            }}
+          >
             End
           </Button>
         ) : (
-          <Button color="success" onClick={handleStart}>
+          <Button
+            color="success"
+            onClick={handleStart}
+            onKeyDown={(e) => {
+              if (e.key === " ") {
+                handleStart();
+              }
+            }}
+          >
             Start
           </Button>
         )}

@@ -65,42 +65,21 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
   sets,
   enableUndoRedo = false,
 }) {
-  const _deleteSet = useWorkoutsStore((state) => state.deleteSet);
-  const _toggleFinished = useWorkoutsStore(
-    (state) => state.updateSetIsFinished
-  );
-  const _updateDuration = useWorkoutsStore((state) => state.updateSetDuration);
-
   const [curTrainSet, setCurTrainSet] = useState<ExerciseSetRow | null>(null);
   const confirmDeleteModal = useDisclosure();
   const timerModal = useDisclosure();
   const setsRef = useRef(sets);
   setsRef.current = sets;
 
-  const deleteSet = useCallback(
-    (setId: string) => {
-      _deleteSet(id, setId);
-    },
-    [id, _deleteSet]
-  );
-
-  const toggleFinished = useCallback(
-    (setId: string, isFinished: boolean) => {
-      _toggleFinished(id, setId, isFinished);
-    },
-    [id, _toggleFinished]
-  );
-
-  const updateDuration = useCallback(
-    (setId: string, duration: string) => {
-      _updateDuration(id, setId, duration);
-    },
-    [id, _updateDuration]
-  );
-
   return (
     <>
-      <Card className={className}>
+      <Card
+        className={className}
+        onFocus={() => {
+          // TODO: set some shortcuts
+          console.log("focus");
+        }}
+      >
         <CardHeader>
           <span className="flex-1 font-medium text-sm">{title}</span>
           <Button
@@ -172,7 +151,21 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
                   return row.isFinished ? (
                     row.bpm
                   ) : (
-                    <BpmInput exerciseId={id} setId={row.id} value={row.bpm} />
+                    <BpmInput
+                      exerciseId={id}
+                      setId={row.id}
+                      value={row.bpm}
+                      onStart={() => {
+                        setCurTrainSet({
+                          id: row.id,
+                          bpm: row.bpm,
+                          duration: row.duration,
+                          setNo: row.setNo,
+                          isFinished: row.isFinished,
+                        });
+                        timerModal.onOpen();
+                      }}
+                    />
                   );
                 },
               },
@@ -188,6 +181,16 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
                       exerciseId={id}
                       setId={row.id}
                       value={row.duration}
+                      onStart={() => {
+                        setCurTrainSet({
+                          id: row.id,
+                          bpm: row.bpm,
+                          duration: row.duration,
+                          setNo: row.setNo,
+                          isFinished: row.isFinished,
+                        });
+                        timerModal.onOpen();
+                      }}
                     />
                   );
                 },
@@ -324,6 +327,11 @@ const AddSetButton = memo(function AddSetButton({
   exerciseId: string;
 }) {
   const addSet = useWorkoutsStore((state) => state.addSet);
+  const lastSet = useWorkoutsStore((state) => {
+    const exercise = state.exercises.find((e) => e.id === exerciseId);
+    if (!exercise) return null;
+    return exercise.sets[exercise.sets.length - 1];
+  });
 
   return (
     <Button
@@ -331,7 +339,10 @@ const AddSetButton = memo(function AddSetButton({
       variant="flat"
       size="sm"
       onClick={() => {
-        addSet(exerciseId, createEmptySet());
+        addSet(exerciseId, {
+          ...createEmptySet(),
+          ...(lastSet ? { bpm: lastSet.bpm, duration: lastSet.duration } : {}),
+        });
       }}
     >
       Add Set
@@ -364,12 +375,16 @@ const BpmInput = memo(function BpmInput({
   exerciseId,
   setId,
   value,
+  onStart,
 }: {
   exerciseId: string;
   setId: string;
   value: string;
+  onStart?: () => void;
 }) {
   const updateBpm = useWorkoutsStore((state) => state.updateSetBpm);
+  const toggleFinished = useWorkoutsStore((state) => state.updateSetIsFinished);
+
   return (
     <NumberInput
       aria-label="bpm"
@@ -381,6 +396,12 @@ const BpmInput = memo(function BpmInput({
       onChange={(value) => {
         updateBpm(exerciseId, setId, String(value));
       }}
+      onToggleFinished={() => {
+        toggleFinished(exerciseId, setId, true);
+      }}
+      onStart={() => {
+        onStart?.();
+      }}
     />
   );
 });
@@ -389,12 +410,16 @@ const DurationInput = memo(function DurationInput({
   exerciseId,
   setId,
   value,
+  onStart,
 }: {
   exerciseId: string;
   setId: string;
   value: string;
+  onStart?: () => void;
 }) {
   const updateDuration = useWorkoutsStore((state) => state.updateSetDuration);
+  const toggleFinished = useWorkoutsStore((state) => state.updateSetIsFinished);
+
   return (
     <NumberInput
       aria-label="duration"
@@ -405,6 +430,12 @@ const DurationInput = memo(function DurationInput({
       value={Number(value)}
       onChange={(value) => {
         updateDuration(exerciseId, setId, String(value));
+      }}
+      onToggleFinished={() => {
+        toggleFinished(exerciseId, setId, true);
+      }}
+      onStart={() => {
+        onStart?.();
       }}
     />
   );
@@ -487,6 +518,12 @@ const SetActions = memo(function SetActions({
     return curSet;
   });
 
+  const curSetIndex = useWorkoutsStore((state) => {
+    const exercise = state.exercises.find((e) => e.id === exerciseId);
+    if (!exercise) return -1;
+    return exercise.sets.findIndex((s) => s.id === setId);
+  });
+
   return (
     <div>
       <Button
@@ -500,7 +537,7 @@ const SetActions = memo(function SetActions({
               id: curSet.id,
               bpm: curSet.bpm,
               duration: curSet.duration,
-              setNo: 0,
+              setNo: curSetIndex + 1,
               isFinished: curSet.isFinished,
             });
             onClickOpenModal?.();

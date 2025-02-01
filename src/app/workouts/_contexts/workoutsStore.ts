@@ -165,6 +165,7 @@ export const createWorkoutsStore = () =>
                   exercise.sets.push({
                     ...existingSet,
                     id: uuidv4(),
+                    isFinished: false,
                   });
                 }
               }
