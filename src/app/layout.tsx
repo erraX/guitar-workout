@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import { Alumni_Sans } from "next/font/google";
 import Navigator from "../components/Navigator";
 import { Providers } from "./providers";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Guitar workout",
@@ -28,6 +29,7 @@ export default function RootLayout({
             <main className="pt-5 px-6 flex">{children}</main>
           </div>
         </Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
