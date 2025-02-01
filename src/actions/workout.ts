@@ -46,6 +46,7 @@ export async function createWorkout(workoutData: WorkoutInput) {
       },
     });
 
+    revalidatePath("/historys");
     return { success: true, data: workout };
   } catch (error) {
     console.error("Error creating workout:", error);
