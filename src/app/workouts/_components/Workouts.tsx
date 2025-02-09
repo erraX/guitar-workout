@@ -45,7 +45,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
 
     // TODO: Add loading
     const result = await createWorkout({
-      duration,
+      duration: time,
       exercises: workoutExercises.map((exercise) => ({
         id: Number(exercise.exerciseId),
         sets: exercise.sets
@@ -59,7 +59,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
     if (!result.success) {
       console.log("create workout error", result.error);
     }
-  }, [duration, workoutExercises, stop]);
+  }, [time, workoutExercises, stop]);
 
   useBeforeUnload(isRunning);
   useClearQueryParams();

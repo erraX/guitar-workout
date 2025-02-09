@@ -7,6 +7,10 @@ const secretKey = new TextEncoder().encode(
 );
 
 export async function middleware(request: NextRequest) {
+  if (process.env.NODE_ENV === "development") {
+    return NextResponse.next();
+  }
+
   // Exclude login page and API from middleware
   if (
     request.nextUrl.pathname === "/login" ||

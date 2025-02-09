@@ -20,6 +20,9 @@ export default async function RootLayout({
 }) {
   const isLoggedIn = await isAuthenticated();
 
+  const showNavigator =
+    process.env.NODE_ENV === "development" ? true : isLoggedIn;
+
   return (
     <html lang="en">
       <head>
@@ -28,7 +31,7 @@ export default async function RootLayout({
       <body>
         <Providers>
           <div className="max-w-page min-w-page m-auto">
-            {isLoggedIn && <Navigator />}
+            {showNavigator && <Navigator />}
             <main className="pt-5 px-6 flex">{children}</main>
           </div>
         </Providers>
