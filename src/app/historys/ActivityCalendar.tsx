@@ -25,15 +25,6 @@ function transformHistoryData(data: Workout[]) {
     const date = format(workout.createdAt, "yyyy-MM-dd");
     const duration = workout.duration;
 
-    // const duration = workout.exercises.reduce((acc: number, exercise: any) => {
-    //   return (
-    //     acc +
-    //     exercise.sets.reduce((acc: number, set: any) => {
-    //       return acc + set.duration;
-    //     }, 0)
-    //   );
-    // }, 0);
-
     if (result.has(date)) {
       result.get(date)!.duration += duration;
     } else {
@@ -57,16 +48,20 @@ export const ActivityCalendar = ({
     const dateStr = format(date, "yyyy-MM-dd");
     const duration = historyByDate.get(dateStr)?.duration ?? 0;
     const hours = Number((duration / 3600).toFixed(1));
-    const minutes = Math.round(duration / 60);
+
+    let minutes = Math.round(duration / 60);
+    if (duration > 0 && minutes === 0) {
+      minutes = 1;
+    }
 
     let level = 0;
-    if (hours > 0 && hours <= 0.5) {
+    if (minutes > 0 && minutes <= 30) {
       level = 1;
-    } else if (hours > 0.5 && hours <= 1) {
+    } else if (minutes > 30 && minutes <= 60) {
       level = 2;
-    } else if (hours > 1 && hours <= 2) {
+    } else if (minutes > 60 && minutes <= 120) {
       level = 3;
-    } else if (hours > 2) {
+    } else if (minutes > 120) {
       level = 4;
     }
 

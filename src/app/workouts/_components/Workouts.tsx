@@ -58,6 +58,8 @@ export function Workouts({ exercises }: WorkoutsProps) {
     });
     if (!result.success) {
       console.log("create workout error", result.error);
+    } else {
+      alert("Create workout successfully!");
     }
   }, [time, workoutExercises, stop]);
 
