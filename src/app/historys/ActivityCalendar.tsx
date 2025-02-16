@@ -1,6 +1,6 @@
 "use client";
 
-import { eachDayOfInterval, format } from "date-fns";
+import { eachDayOfInterval, format, subDays } from "date-fns";
 import {
   ActivityCalendar as ActivityCalendarComponent,
   type ThemeInput,
@@ -18,28 +18,16 @@ export interface ActivityCalendarProps {
   year?: number;
 }
 
-function transformHistoryData(data: Workout[]) {
-  const result = new Map<string, { date: string; duration: number }>();
-
-  data.forEach((workout: any) => {
-    const date = format(workout.createdAt, "yyyy-MM-dd");
-    const duration = workout.duration;
-
-    if (result.has(date)) {
-      result.get(date)!.duration += duration;
-    } else {
-      result.set(date, { date, duration });
-    }
-  });
-
-  return result;
-}
-
 export const ActivityCalendar = ({
   year = 2025,
   data,
 }: ActivityCalendarProps) => {
   const historyByDate = transformHistoryData(data);
+
+  console.log("historyByDate", historyByDate);
+
+  const daysInARow = getNumOfConsecutiveDays(historyByDate);
+  console.log("daysInARow", daysInARow);
 
   const activities = eachDayOfInterval({
     start: new Date(year, 0, 1),
@@ -73,10 +61,6 @@ export const ActivityCalendar = ({
     };
   });
 
-  const totalHours = activities.reduce((acc: number, activity: any) => {
-    return acc + activity.hours;
-  }, 0);
-
   return (
     <div className="mb-10">
       <ActivityCalendarComponent
@@ -84,7 +68,10 @@ export const ActivityCalendar = ({
         weekStart={1}
         theme={gitHubTheme}
         labels={{
-          totalCount: `Total ${totalHours} hours in ${year}`,
+          totalCount:
+            daysInARow > 0
+              ? `You've been active for ${daysInARow} days in a row, keep it up!`
+              : " ",
         }}
         renderBlock={(block, activity) => {
           if (activity.count === 0) {
@@ -104,3 +91,42 @@ export const ActivityCalendar = ({
     </div>
   );
 };
+
+function transformHistoryData(data: Workout[]) {
+  const result = new Map<string, { date: string; duration: number }>();
+
+  data.forEach((workout: any) => {
+    const date = format(workout.createdAt, "yyyy-MM-dd");
+    const duration = workout.duration;
+
+    if (result.has(date)) {
+      result.get(date)!.duration += duration;
+    } else {
+      result.set(date, { date, duration });
+    }
+  });
+
+  return result;
+}
+
+function getNumOfConsecutiveDays(
+  historyByDate: Map<string, { date: string; duration: number }>
+) {
+  const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
+
+  let result = 0;
+  let key = yesterday;
+  let offset = 1;
+  while (true) {
+    if (
+      ((historyByDate.has(key) && historyByDate.get(key)?.duration) || 0) > 0
+    ) {
+      result++;
+    } else {
+      break;
+    }
+    key = format(subDays(yesterday, offset++), "yyyy-MM-dd");
+  }
+
+  return result;
+}
