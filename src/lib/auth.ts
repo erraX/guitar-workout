@@ -10,7 +10,7 @@ const secretKey = new TextEncoder().encode(JWT_SECRET);
 export const generateToken = async (username: string) => {
   return await new SignJWT({ username })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("24h")
+    .setExpirationTime("1week")
     .sign(secretKey);
 };
 
