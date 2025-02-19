@@ -2,12 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 
 export interface ExerciseValues {
   name?: string;
   link?: string;
   description?: string;
+  category?: string;
 }
 
 export default function ExerciseForm({
@@ -22,6 +23,7 @@ export default function ExerciseForm({
     name: "",
     link: "",
     description: "",
+    category: "",
     ...initialValues,
   });
 
@@ -63,6 +65,31 @@ export default function ExerciseForm({
         value={values.description}
         onChange={(evt) => setFieldValue("description", evt.target.value)}
       />
+      <Select
+        className="max-w-xs"
+        items={[
+          {
+            label: "Down Picking",
+            value: "DOWN_PICKING",
+          },
+          {
+            label: "Hand Sync",
+            value: "HAND_SYNC",
+          },
+          {
+            label: "Alternative Picking",
+            value: "ALTERNATIVE_PICKING",
+          },
+          {
+            label: "Sweep Picking",
+            value: "SWEEP_PICKING",
+          },
+        ]}
+        label="Category"
+        placeholder="Select an category"
+      >
+        {(category) => <SelectItem>{category.label}</SelectItem>}
+      </Select>
       <div className="flex">
         <Button className="mr-5" color="primary" onClick={handleSubmit}>
           Submit

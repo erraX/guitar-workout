@@ -18,6 +18,7 @@ export default function ExercisesCreationPage() {
       initialValues={{
         name: "",
         link: "",
+        category: "",
         description: "",
       }}
       onSubmit={handleSubmit}

@@ -15,6 +15,7 @@ model Exercise {
   name        String
   description String?
   link        String?
+  category    String?
   workouts    WorkoutExercise[]
   createdAt   DateTime        @default(now())
   status      String          @default("ACTIVE")
