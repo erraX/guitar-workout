@@ -63,6 +63,7 @@ export const createWorkoutsStore = () =>
                 id: uuidv4(),
                 exerciseId,
                 sets: [createEmptySet()],
+                notes: "",
               },
             ],
           })),
