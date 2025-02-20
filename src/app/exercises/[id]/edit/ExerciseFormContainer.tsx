@@ -16,6 +16,7 @@ export default function ExerciseFormContainer({
 
   const handleSubmit = async (values: any) => {
     await updateExercise(exercise.id, values);
+    alert("Exercise updated successfully");
     router.push(`/exercises/`);
   };
 
@@ -25,6 +26,7 @@ export default function ExerciseFormContainer({
         name: exercise.name,
         link: exercise.link ?? "",
         description: exercise.description ?? "",
+        category: exercise.category ?? "",
       }}
       onSubmit={handleSubmit}
     />

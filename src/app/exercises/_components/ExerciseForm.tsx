@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
+import { exerciseCategories } from "@/app/_configs/exercise-categories";
 
 export interface ExerciseValues {
   name?: string;
@@ -44,6 +45,18 @@ export default function ExerciseForm({
 
   return (
     <div className="flex w-full flex-col">
+      <Select
+        className="mb-5"
+        selectedKeys={[values.category]}
+        onChange={(evt) => setFieldValue("category", evt.target.value)}
+        items={exerciseCategories}
+        label="Category"
+        placeholder="Select an category"
+      >
+        {(category) => (
+          <SelectItem key={category.value}>{category.label}</SelectItem>
+        )}
+      </Select>
       <Input
         className="mb-5"
         type="name"
@@ -65,31 +78,6 @@ export default function ExerciseForm({
         value={values.description}
         onChange={(evt) => setFieldValue("description", evt.target.value)}
       />
-      <Select
-        className="max-w-xs"
-        items={[
-          {
-            label: "Down Picking",
-            value: "DOWN_PICKING",
-          },
-          {
-            label: "Hand Sync",
-            value: "HAND_SYNC",
-          },
-          {
-            label: "Alternative Picking",
-            value: "ALTERNATIVE_PICKING",
-          },
-          {
-            label: "Sweep Picking",
-            value: "SWEEP_PICKING",
-          },
-        ]}
-        label="Category"
-        placeholder="Select an category"
-      >
-        {(category) => <SelectItem>{category.label}</SelectItem>}
-      </Select>
       <div className="flex">
         <Button className="mr-5" color="primary" onClick={handleSubmit}>
           Submit
