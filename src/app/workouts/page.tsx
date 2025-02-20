@@ -28,6 +28,7 @@ export default async function WorkoutsPage(props: {
                 workout?.exercises?.map((exercise) => ({
                   id: uuidv4(),
                   exerciseId: exercise.exercise.id.toString(),
+                  notes: exercise.notes ?? "",
                   sets: exercise.sets.map((set) => ({
                     id: set.id.toString(),
                     bpm: set.bpm.toString(),
