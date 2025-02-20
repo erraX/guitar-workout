@@ -48,6 +48,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
       duration: time,
       exercises: workoutExercises.map((exercise) => ({
         id: Number(exercise.exerciseId),
+        notes: exercise.notes,
         sets: exercise.sets
           .filter((set) => set.isFinished)
           .map((set) => ({
@@ -95,6 +96,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
             <ExerciseCard
               key={exercise.id}
               id={exercise.id}
+              notes={exercise.notes}
               className="mb-3"
               title={getExerciseNameById(
                 exercises,

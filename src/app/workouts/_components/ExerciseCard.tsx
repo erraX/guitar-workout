@@ -18,6 +18,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Textarea,
   useDisclosure,
 } from "@nextui-org/react";
 import {
@@ -39,6 +40,7 @@ export interface ExerciseCardProps {
   className?: string;
   enableUndoRedo?: boolean;
   sets: ExerciseSet[];
+  notes: string;
 
   onChange?: (id: string, newSets: ExerciseSet[]) => void;
 
@@ -63,6 +65,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
   title,
   id,
   sets,
+  notes,
   enableUndoRedo = false,
 }) {
   const [curTrainSet, setCurTrainSet] = useState<ExerciseSetRow | null>(null);
@@ -70,6 +73,8 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
   const timerModal = useDisclosure();
   const setsRef = useRef(sets);
   setsRef.current = sets;
+
+  const updateNotes = useWorkoutsStore((state) => state.updateNotes);
 
   return (
     <>
@@ -227,6 +232,15 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
             <AddSetButton exerciseId={id} />
             <CompleteAllButton exerciseId={id} />
           </div>
+          <Textarea
+            label="Notes"
+            placeholder=""
+            className="mt-3"
+            value={notes || ""}
+            onChange={(e) => {
+              updateNotes(id, e.target.value);
+            }}
+          />
         </CardBody>
       </Card>
       <DeleteExerciseModal

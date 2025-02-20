@@ -9,6 +9,7 @@ export interface ExerciseInWorkout {
   id: string;
   exerciseId: string;
   sets: ExerciseSet[];
+  notes: string;
 }
 
 export interface Workout {

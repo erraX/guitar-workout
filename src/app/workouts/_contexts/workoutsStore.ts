@@ -30,6 +30,7 @@ type WorkoutsStoreActions = {
     setId: string,
     isFinished: boolean
   ) => void;
+  updateNotes: (exerciseId: string, notes: string) => void;
   completeAllSets: (exerciseId: string) => void;
   duplicateSet: (exerciseId: string, setId: string) => void;
 };
@@ -141,6 +142,16 @@ export const createWorkoutsStore = () =>
                 if (existingSet) {
                   existingSet.isFinished = isFinished;
                 }
+              }
+            })
+          ),
+
+        updateNotes: (exerciseId, notes) =>
+          set(
+            produce<WorkoutsStoreState>((state) => {
+              const exercise = state.exercises.find((e) => e.id === exerciseId);
+              if (exercise) {
+                exercise.notes = notes;
               }
             })
           ),

@@ -11,6 +11,7 @@ interface SetInput {
 interface ExerciseInput {
   id: number;
   sets: SetInput[];
+  notes: string;
 }
 
 interface WorkoutInput {
@@ -27,6 +28,7 @@ export async function createWorkout(workoutData: WorkoutInput) {
         exercises: {
           create: workoutData.exercises.map((exercise) => ({
             exerciseId: exercise.id,
+            notes: exercise.notes,
             sets: {
               create: exercise.sets.map((set) => ({
                 bpm: set.bpm,
