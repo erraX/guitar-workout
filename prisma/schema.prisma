@@ -35,6 +35,7 @@ model WorkoutExercise {
   exercise   Exercise @relation(fields: [exerciseId], references: [id])
   exerciseId Int
   sets       Set[]
+  notes      String?
 }
 
 model Set {
