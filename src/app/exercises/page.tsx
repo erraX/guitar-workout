@@ -8,9 +8,9 @@ export default async function ExercisesPage() {
 
   return (
     <div className="flex flex-col w-full">
-      <Link className="mb-3" href="/exercises/create">
-        <Button color="primary">Create Exercise</Button>
-      </Link>
+      <Button className="mb-3 self-end" variant="secondary" asChild>
+        <Link href="/exercises/create">Create Exercise</Link>
+      </Button>
       <ExercisesTable data={exercises} />
     </div>
   );
