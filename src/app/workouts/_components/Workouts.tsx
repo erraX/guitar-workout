@@ -3,7 +3,8 @@
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Exercise } from "@prisma/client";
-import { Button, useDisclosure } from "@nextui-org/react";
+import { useDisclosure } from "@nextui-org/react";
+import { Button } from "@/components/ui/button";
 
 import { createWorkout } from "@/actions/workout";
 
@@ -87,7 +88,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
               });
             }}
           />
-          <Button className="ml-3" onClick={clear}>
+          <Button className="ml-3" variant="secondary" onClick={clear}>
             Clear
           </Button>
         </div>

@@ -2,8 +2,8 @@
 
 import { FC } from "react";
 
-import { Button } from "@nextui-org/react";
-import { RiPlayCircleLine, RiStopCircleLine } from "@remixicon/react";
+import { CirclePlay, CircleStop } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import { Time } from "@/components/Time";
 
@@ -15,13 +15,14 @@ export interface StopWatchButtonProps {
 }
 
 export default (function StopWatch({ time, isRunning, onStop, onStart }) {
+  // FIXME: alignment and icon size
   const button = isRunning ? (
-    <Button isIconOnly color="danger" onClick={onStop}>
-      <RiStopCircleLine />
+    <Button size="icon" variant="destructive" onClick={onStop}>
+      <CircleStop />
     </Button>
   ) : (
-    <Button isIconOnly color="success" onClick={onStart}>
-      <RiPlayCircleLine color="white" />
+    <Button size="icon" variant="success" onClick={onStart}>
+      <CirclePlay />
     </Button>
   );
   return (
