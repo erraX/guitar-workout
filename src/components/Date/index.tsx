@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { Skeleton } from "@nextui-org/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const DateNoSSR = dynamic(() => import("./Date"), {
   ssr: false,
