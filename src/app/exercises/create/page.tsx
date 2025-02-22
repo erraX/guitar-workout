@@ -9,15 +9,11 @@ export default function ExercisesCreationPage() {
   const router = useRouter();
 
   const handleSubmit = async (values: any) => {
-    try {
-      const { success } = await createExercise(values);
-      if (success) {
-        toast.success("Exercise created successfully");
-        router.push(`/exercises/`);
-      } else {
-        toast.error("Failed to create exercise");
-      }
-    } catch (error) {
+    const { success } = await createExercise(values);
+    if (success) {
+      toast.success("Exercise created successfully");
+      router.push(`/exercises/`);
+    } else {
       toast.error("Failed to create exercise");
     }
   };

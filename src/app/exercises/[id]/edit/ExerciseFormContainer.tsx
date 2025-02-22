@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Exercise } from "@prisma/client";
 import ExerciseForm from "../../_components/ExerciseForm";
@@ -15,9 +16,13 @@ export default function ExerciseFormContainer({
   const router = useRouter();
 
   const handleSubmit = async (values: any) => {
-    await updateExercise(exercise.id, values);
-    alert("Exercise updated successfully");
-    router.push(`/exercises/`);
+    const { success } = await updateExercise(exercise.id, values);
+    if (success) {
+      toast.success("Exercise updated successfully");
+      router.push(`/exercises/`);
+    } else {
+      toast.error("Failed to update exercise");
+    }
   };
 
   return (
