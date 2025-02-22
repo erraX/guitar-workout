@@ -32,7 +32,7 @@ export default function FinishConfirmModal({
             Dismiss
           </Button>
           <Button
-            variant="destructive"
+            variant="warning"
             onClick={() => {
               onOpenChange(false);
               onAbort?.();

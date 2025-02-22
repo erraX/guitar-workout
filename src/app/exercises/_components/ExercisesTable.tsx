@@ -26,10 +26,12 @@ export function ExercisesTable({ data }: ExercisesTableProps) {
     <div className="rounded-md border">
       <Table>
         <TableHeader>
-          <TableHead>NAME</TableHead>
-          <TableHead>CATEGORY</TableHead>
-          <TableHead>DESCRIPTION</TableHead>
-          <TableHead>ACTIONS</TableHead>
+          <TableRow>
+            <TableHead>NAME</TableHead>
+            <TableHead>CATEGORY</TableHead>
+            <TableHead>DESCRIPTION</TableHead>
+            <TableHead>ACTIONS</TableHead>
+          </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((exercise) => (

@@ -46,10 +46,6 @@ export interface ExerciseSetRow {
   isFinished: boolean;
 }
 
-const numInputClassNames = {
-  inputWrapper: "h-7",
-};
-
 export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
   className,
   title,
@@ -383,9 +379,7 @@ const BpmInput = memo(function BpmInput({
     <NumberInput
       aria-label="bpm"
       type="text"
-      size="sm"
       min={0}
-      classNames={numInputClassNames}
       value={Number(value)}
       onChange={(value) => {
         updateBpm(exerciseId, setId, String(value));
@@ -418,9 +412,7 @@ const DurationInput = memo(function DurationInput({
     <NumberInput
       aria-label="duration"
       type="text"
-      size="sm"
       min={0}
-      classNames={numInputClassNames}
       value={Number(value)}
       onChange={(value) => {
         updateDuration(exerciseId, setId, String(value));

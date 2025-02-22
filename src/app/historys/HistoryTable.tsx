@@ -28,10 +28,12 @@ export function HistorysTable({ data }: HistorysTableProps) {
     <div className="rounded-md border">
       <Table>
         <TableHeader>
-          <TableHead>ID</TableHead>
-          <TableHead>EXERCISES</TableHead>
-          <TableHead>CREATE DATE</TableHead>
-          <TableHead>ACTIONS</TableHead>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>EXERCISES</TableHead>
+            <TableHead>CREATE DATE</TableHead>
+            <TableHead>ACTIONS</TableHead>
+          </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((workout) => (

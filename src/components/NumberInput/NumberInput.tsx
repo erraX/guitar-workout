@@ -1,10 +1,13 @@
-import { memo } from "react";
-import { Input, InputProps } from "@nextui-org/react";
+import { memo, type ComponentProps } from "react";
+import { Input } from "@/components/ui/input";
 
 type NumberInputValue = number | null | undefined;
 
 export interface NumberInputProps
-  extends Omit<InputProps, "onChange" | "value" | "defaultValue"> {
+  extends Omit<
+    ComponentProps<typeof Input>,
+    "onChange" | "value" | "defaultValue"
+  > {
   value?: NumberInputValue;
   defaultValue?: NumberInputValue;
   onChange?: (value: NumberInputValue) => void;
@@ -12,6 +15,7 @@ export interface NumberInputProps
   onStart?: () => void;
   min?: number;
   max?: number;
+  className?: string;
 }
 
 export const NumberInput = memo(function NumberInput({
@@ -26,12 +30,11 @@ export const NumberInput = memo(function NumberInput({
 }: NumberInputProps) {
   const numValue = Number.isNaN(Number(value)) ? "" : String(value);
   const numDefaultValue = Number.isNaN(Number(defaultValue))
-    ? ""
+    ? undefined
     : String(defaultValue);
 
   return (
     <Input
-      isClearable
       value={numValue}
       defaultValue={numDefaultValue}
       onKeyDown={(event) => {
@@ -99,9 +102,6 @@ export const NumberInput = memo(function NumberInput({
         }
 
         event.preventDefault();
-      }}
-      onClear={() => {
-        onChange?.(null);
       }}
       onChange={(event) => {
         const value = event.target.value;
