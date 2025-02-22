@@ -55,7 +55,7 @@ export const AddExercise: FC<AddExerciseProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2">
-          <Popover open={selectorOpen} onOpenChange={setSelectorOpen} modal>
+          <Popover modal open={selectorOpen} onOpenChange={setSelectorOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -80,19 +80,12 @@ export const AddExercise: FC<AddExerciseProps> = ({
                   placeholder="Search exercise..."
                   className="h-9"
                 />
-                <CommandList
-                  onScrollCapture={(event) => {
-                    console.log("Scroll command list", event);
-                  }}
-                >
+                <CommandList>
                   <CommandEmpty>No exercise found.</CommandEmpty>
-                  <CommandGroup
-                    onScrollCapture={(event) => {
-                      console.log("Scroll command group", event);
-                    }}
-                  >
+                  <CommandGroup>
                     {exercises.map((exercise) => (
                       <CommandItem
+                        className="cursor-pointer"
                         key={exercise.id}
                         value={`${exercise.name}.(${exercise.id})`}
                         onSelect={() => {
