@@ -1,56 +1,101 @@
 "use client";
 
-import { PropsWithChildren } from "react";
-import {
-  Button,
-  Link,
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-} from "@nextui-org/react";
+import { Alumni_Sans } from "next/font/google";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Alumni_Sans } from "next/font/google";
+import { Calendar, ListChecks, Dumbbell, Plus } from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+  SidebarRail,
+} from "@/components/ui/sidebar";
 
 const inter = Alumni_Sans({ subsets: ["latin"] });
 
-export default function Navigator() {
+const items = [
+  {
+    title: "Workouts",
+    url: "/workouts",
+    icon: Dumbbell,
+  },
+  {
+    title: "Exercises",
+    url: "/exercises",
+    icon: ListChecks,
+    subItems: [
+      {
+        title: "Create",
+        url: "/exercises/create",
+        icon: Plus,
+      },
+    ],
+  },
+  {
+    title: "Historys",
+    url: "/historys",
+    icon: Calendar,
+  },
+];
+
+export function Navigator() {
   const pathname = usePathname();
   const isSubRoute = (routerPath: string) =>
     new RegExp(`^${routerPath}`).test(pathname);
 
   return (
-    <Navbar maxWidth="full">
-      <NavbarBrand className="grow-0 mr-5">
-        <p className={`text-2xl font-bold ${inter.className}`}>🎸 WORKOUT</p>
-      </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-2">
-        <NavbarItem>
-          <Link href="/workouts">
-            <NavButton isActive={isSubRoute("/workouts")}>WORKOUTS</NavButton>
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link href="/exercises">
-            <NavButton isActive={isSubRoute("/exercises")}>EXERCISES</NavButton>
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link href="/historys">
-            <NavButton isActive={isSubRoute("/history")}>HISTORY</NavButton>
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
-  );
-}
-
-function NavButton({ children, isActive }: PropsWithChildren<{ isActive?: boolean }>) {
-  const variant = isActive ? 'flat' : 'light';
-  return (
-    <Button variant={variant} color="primary">
-      {children}
-    </Button>
+    <Sidebar>
+      <SidebarHeader>
+        <p className={`text-2xl font-bold ${inter.className}`}>
+          🎸 GUITAR WORKOUT
+        </p>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isSubRoute(item.url)}>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                  {item.subItems && (
+                    <SidebarMenuSub>
+                      {item.subItems.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={isSubRoute(subItem.url)}
+                          >
+                            <Link href={subItem.url}>
+                              <subItem.icon />
+                              <span>{subItem.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  )}
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
   );
 }

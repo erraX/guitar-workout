@@ -2,10 +2,11 @@ import "@/styles/globals.css";
 
 import { Metadata } from "next";
 import { Alumni_Sans } from "next/font/google";
-import Navigator from "../components/Navigator";
+import { Navigator } from "../components/Navigator";
 import { Providers } from "./providers";
 import { isAuthenticated } from "@/lib/auth";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export const metadata: Metadata = {
   title: "Guitar workout",
@@ -30,10 +31,12 @@ export default async function RootLayout({
       </head>
       <body>
         <Providers>
-          <div className="max-w-page min-w-page m-auto">
-            {showNavigator && <Navigator />}
-            <main className="pt-5 px-6 flex">{children}</main>
-          </div>
+          <SidebarProvider>
+            <div className="w-screen flex flex-row">
+              {showNavigator && <Navigator />}
+              <main className="pt-5 px-6 flex flex-1">{children}</main>
+            </div>
+          </SidebarProvider>
         </Providers>
         <SpeedInsights />
       </body>
