@@ -1,6 +1,7 @@
-import { Button, Link } from "@nextui-org/react";
+import Link from "next/link";
 import { getExercises } from "@/service/exercise";
-import { ExercisesTable } from './_components/ExercisesTable';
+import { ExercisesTable } from "./_components/ExercisesTable";
+import { Button } from "@/components/ui/button";
 
 export default async function ExercisesPage() {
   const exercises = await getExercises();
