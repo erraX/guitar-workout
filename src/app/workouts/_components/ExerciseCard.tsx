@@ -5,34 +5,24 @@ import { NumberInput } from "@/components/NumberInput";
 import { NativeTable } from "@/components/NativeTable";
 import { Trainer } from "@/components/Trainer";
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Dropdown,
-  DropdownItem,
   DropdownMenu,
-  DropdownTrigger,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Textarea,
-  useDisclosure,
-} from "@nextui-org/react";
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
-  RiArrowGoBackLine,
-  RiArrowGoForwardLine,
-  RiCheckboxBlankLine,
-  RiCheckboxLine,
-  RiDeleteBinLine,
-  RiSettings2Line,
-  RiPlayCircleLine,
-} from "@remixicon/react";
-import { FC, useCallback, useState } from "react";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CirclePlay, Trash2, Settings, SquareCheck } from "lucide-react";
+import { FC, useState } from "react";
 import { useWorkoutsStore } from "../_contexts/WorkoutsStoreContext";
-import { UseDisclosureReturn } from "./FinishConfirmModal";
 
 export interface ExerciseCardProps {
   id: string;
@@ -69,8 +59,9 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
   enableUndoRedo = false,
 }) {
   const [curTrainSet, setCurTrainSet] = useState<ExerciseSetRow | null>(null);
-  const confirmDeleteModal = useDisclosure();
-  const timerModal = useDisclosure();
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [timerModalOpen, setTimerModalOpen] = useState(false);
+
   const setsRef = useRef(sets);
   setsRef.current = sets;
 
@@ -78,52 +69,47 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
 
   return (
     <>
-      <Card
-        className={className}
-        onFocus={() => {
-          // TODO: set some shortcuts
-          console.log("focus");
-        }}
-      >
+      <Card className={className}>
         <CardHeader>
-          <span className="flex-1 font-medium text-sm">{title}</span>
-          <Button
-            isIconOnly
-            className="ml-2"
-            color="danger"
-            size="sm"
-            onClick={confirmDeleteModal.onOpen}
-          >
-            <RiDeleteBinLine size="18" />
-          </Button>
-          {enableUndoRedo && (
-            <Button
-              isIconOnly
-              className="ml-2"
-              color="warning"
-              size="sm"
-              onClick={() => {
-                console.log("undo");
-              }}
-            >
-              <RiArrowGoBackLine size="18" color="white" />
-            </Button>
-          )}
-          {enableUndoRedo && (
-            <Button
-              isIconOnly
-              className="ml-2"
-              color="warning"
-              size="sm"
-              onClick={() => {
-                console.log("redo");
-              }}
-            >
-              <RiArrowGoForwardLine size="18" color="white" />
-            </Button>
-          )}
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex-1 font-medium text-sm">{title}</span>
+            <div>
+              <Button
+                variant="destructive"
+                className="ml-2"
+                size="icon"
+                onClick={() => setConfirmModalOpen(true)}
+              >
+                <Trash2 />
+              </Button>
+              {enableUndoRedo && (
+                <Button
+                  variant="secondary"
+                  className="ml-2"
+                  size="icon"
+                  onClick={() => {
+                    console.log("undo");
+                  }}
+                >
+                  UNDO
+                </Button>
+              )}
+              {enableUndoRedo && (
+                <Button
+                  variant="secondary"
+                  className="ml-2"
+                  size="icon"
+                  onClick={() => {
+                    console.log("redo");
+                  }}
+                >
+                  REDO
+                </Button>
+              )}
+            </div>
+          </CardTitle>
         </CardHeader>
-        <CardBody>
+        <CardContent>
           <NativeTable
             aria-label="exercise-table"
             className="mb-3"
@@ -168,7 +154,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
                           setNo: row.setNo,
                           isFinished: row.isFinished,
                         });
-                        timerModal.onOpen();
+                        setTimerModalOpen(true);
                       }}
                     />
                   );
@@ -194,7 +180,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
                           setNo: row.setNo,
                           isFinished: row.isFinished,
                         });
-                        timerModal.onOpen();
+                        setTimerModalOpen(true);
                       }}
                     />
                   );
@@ -210,7 +196,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
                       exerciseId={id}
                       setId={row.id}
                       isFinished={row.isFinished}
-                      onClickOpenModal={timerModal.onOpen}
+                      onClickOpenModal={() => setTimerModalOpen(true)}
                       onSetCurTrainSet={setCurTrainSet}
                     />
                   );
@@ -233,26 +219,27 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
             <CompleteAllButton exerciseId={id} />
           </div>
           <Textarea
-            label="Notes"
-            placeholder=""
+            placeholder="Notes"
             className="mt-3"
             value={notes || ""}
             onChange={(e) => {
               updateNotes(id, e.target.value);
             }}
           />
-        </CardBody>
+        </CardContent>
       </Card>
       <DeleteExerciseModal
         title={title}
         exerciseId={id}
-        modalDisclosure={confirmDeleteModal}
+        open={confirmModalOpen}
+        onOpenChange={setConfirmModalOpen}
       />
       <TrainerModal
-        timerModal={timerModal}
         exerciseId={id}
         exerciseName={title}
         set={curTrainSet}
+        open={timerModalOpen}
+        onOpenChange={setTimerModalOpen}
       />
     </>
   );
@@ -276,25 +263,24 @@ const MarkSetFinishedButton = memo(function MarkSetFinishedButton({
   return isFinished ? (
     <Button
       className={className}
-      isIconOnly
-      color="success"
-      size="sm"
+      variant="success"
+      size="icon"
       onClick={() => {
         _toggleFinished(exerciseId, setId, false);
       }}
     >
-      <RiCheckboxLine color="white" size="18" />
+      <SquareCheck />
     </Button>
   ) : (
     <Button
       className={className}
-      isIconOnly
-      size="sm"
+      variant="secondary"
+      size="icon"
       onClick={() => {
         _toggleFinished(exerciseId, setId, true);
       }}
     >
-      <RiCheckboxBlankLine color="white" size="18" />
+      <SquareCheck />
     </Button>
   );
 });
@@ -307,31 +293,25 @@ const SetToolButtons = memo(function SetToolButtons({
   onDuplicate: () => void;
 }) {
   return (
-    <Dropdown>
-      <DropdownTrigger>
-        <Button isIconOnly className="ml-2" size="sm">
-          <RiSettings2Line size="18" color="white" />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="secondary" className="ml-2" size="icon">
+          <Settings />
         </Button>
-      </DropdownTrigger>
-      <DropdownMenu
-        onAction={(key) => {
-          if (key === "delete") {
-            onDelete();
-            return;
-          }
-
-          if (key === "duplicate") {
-            onDuplicate();
-            return;
-          }
-        }}
-      >
-        <DropdownItem key="delete" className="text-danger" color="danger">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem
+          key="delete"
+          className="text-danger"
+          onClick={onDelete}
+        >
           Delete
-        </DropdownItem>
-        <DropdownItem key="duplicate">Duplicate</DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
+        </DropdownMenuItem>
+        <DropdownMenuItem key="duplicate" onClick={onDuplicate}>
+          Duplicate
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 });
 
@@ -350,7 +330,7 @@ const AddSetButton = memo(function AddSetButton({
   return (
     <Button
       className="flex-1"
-      variant="flat"
+      variant="secondary"
       size="sm"
       onClick={() => {
         addSet(exerciseId, {
@@ -374,7 +354,7 @@ const CompleteAllButton = memo(function CompleteAllButton({
   return (
     <Button
       className="flex-1 ml-3"
-      variant="flat"
+      variant="secondary"
       size="sm"
       onClick={() => {
         completeAllSets(exerciseId);
@@ -459,52 +439,46 @@ const DeleteExerciseModal = memo(
   function DeleteExerciseModal({
     title,
     exerciseId,
-    modalDisclosure,
+    open,
+    onOpenChange,
   }: {
     title: string;
     exerciseId: string;
-    modalDisclosure: UseDisclosureReturn;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
   }) {
     const deleteExercise = useWorkoutsStore((state) => state.deleteExercise);
 
     return (
-      <Modal
-        isOpen={modalDisclosure.isOpen}
-        onOpenChange={modalDisclosure.onOpenChange}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Delete exercise?
-              </ModalHeader>
-              <ModalBody>
-                <p>This will delete &quot;{title}&quot;</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button variant="light" onPress={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  color="danger"
-                  onPress={() => {
-                    deleteExercise(exerciseId);
-                    onClose();
-                  }}
-                >
-                  Delete
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader className="flex flex-col gap-1">
+            <DialogTitle>Delete exercise?</DialogTitle>
+          </DialogHeader>
+          <p>This will delete &quot;{title}&quot;</p>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                deleteExercise(exerciseId);
+                onOpenChange(false);
+              }}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     );
   },
   (prevProps, nextProps) => {
     return (
-      prevProps.modalDisclosure.isOpen === nextProps.modalDisclosure.isOpen &&
-      prevProps.exerciseId === nextProps.exerciseId
+      prevProps.open === nextProps.open &&
+      prevProps.exerciseId === nextProps.exerciseId &&
+      prevProps.title === nextProps.title
     );
   }
 );
@@ -541,10 +515,9 @@ const SetActions = memo(function SetActions({
   return (
     <div>
       <Button
-        isIconOnly
-        color="success"
-        size="sm"
-        isDisabled={isFinished}
+        variant="success"
+        size="icon"
+        disabled={isFinished}
         onClick={() => {
           if (curSet) {
             onSetCurTrainSet({
@@ -558,18 +531,17 @@ const SetActions = memo(function SetActions({
           }
         }}
       >
-        <RiPlayCircleLine size="18" color="white" />
+        <CirclePlay />
       </Button>
       <Button
-        isIconOnly
+        variant="destructive"
         className="ml-2"
-        color="danger"
-        size="sm"
+        size="icon"
         onClick={() => {
           deleteSet(exerciseId, setId);
         }}
       >
-        <RiDeleteBinLine size="18" color="white" />
+        <Trash2 />
       </Button>
       <SetToolButtons
         onDelete={() => {
@@ -585,12 +557,14 @@ const SetActions = memo(function SetActions({
 
 const TrainerModal = memo(
   function TrainerModal({
-    timerModal,
+    open,
+    onOpenChange,
     exerciseId,
     exerciseName,
     set,
   }: {
-    timerModal: UseDisclosureReturn;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
     exerciseId: string;
     exerciseName: string;
     set: ExerciseSetRow | null;
@@ -601,13 +575,11 @@ const TrainerModal = memo(
     );
 
     return (
-      <Modal
-        size="full"
-        hideCloseButton
-        isOpen={timerModal.isOpen}
-        onOpenChange={timerModal.onOpenChange}
-      >
-        <ModalContent>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Trainer for {exerciseName}</DialogTitle>
+          </DialogHeader>
           <Trainer
             exerciseName={exerciseName}
             set={set}
@@ -615,15 +587,15 @@ const TrainerModal = memo(
               updateDuration(exerciseId, setId, duration);
               toggleFinished(exerciseId, setId, true);
             }}
-            onClose={timerModal.onClose}
+            onClose={() => onOpenChange(false)}
           />
-        </ModalContent>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     );
   },
   (prevProps, nextProps) => {
     return (
-      prevProps.timerModal.isOpen === nextProps.timerModal.isOpen &&
+      prevProps.open === nextProps.open &&
       prevProps.exerciseId === nextProps.exerciseId &&
       prevProps.exerciseName === nextProps.exerciseName &&
       prevProps.set === nextProps.set

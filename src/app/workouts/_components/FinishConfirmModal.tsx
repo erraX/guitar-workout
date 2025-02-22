@@ -1,63 +1,56 @@
 import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure,
-} from "@nextui-org/react";
-
-export type UseDisclosureReturn = ReturnType<typeof useDisclosure>;
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export interface FinishConfirmModalProps {
-  modal: UseDisclosureReturn;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onAbort?: () => void;
   onStop?: () => void;
 }
 
 export default function FinishConfirmModal({
-  modal,
+  open,
+  onOpenChange,
   onAbort,
   onStop,
 }: FinishConfirmModalProps) {
   return (
-    <Modal isOpen={modal.isOpen} onOpenChange={modal.onOpenChange}>
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              Finish workout?
-            </ModalHeader>
-            <ModalBody>
-              <p>This will stop the workout</p>
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="light" onPress={onClose}>
-                Dismiss
-              </Button>
-              <Button
-                color="warning"
-                onPress={() => {
-                  onClose();
-                  onAbort?.();
-                }}
-              >
-                Abort
-              </Button>
-              <Button
-                color="danger"
-                onPress={() => {
-                  onClose();
-                  onStop?.();
-                }}
-              >
-                Stop
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
-    </Modal>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader className="flex flex-col gap-1">
+          <DialogTitle>Finish workout?</DialogTitle>
+        </DialogHeader>
+        <p>This will stop the workout</p>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+            Dismiss
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              onOpenChange(false);
+              onAbort?.();
+            }}
+          >
+            Abort
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              onOpenChange(false);
+              onStop?.();
+            }}
+          >
+            Stop
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

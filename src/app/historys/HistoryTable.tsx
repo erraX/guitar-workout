@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { deleteWorkout } from "@/actions/workout";
 import {
   Table,
@@ -79,8 +80,13 @@ export function HistorysTable({ data }: HistorysTableProps) {
                   size="icon"
                   variant="destructive"
                   onClick={async () => {
-                    await deleteWorkout(workout.id);
-                    router.refresh();
+                    const result = await deleteWorkout(workout.id);
+                    if (!result.success) {
+                      toast.error("Failed to delete workout");
+                    } else {
+                      toast.success("Workout deleted successfully!");
+                      router.refresh();
+                    }
                   }}
                 >
                   <Trash2 />

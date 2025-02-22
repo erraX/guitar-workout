@@ -90,7 +90,7 @@ export function Trainer({
           </Button>
         ) : (
           <Button
-            color="success"
+            variant="success"
             onClick={handleStart}
             onKeyDown={(e) => {
               if (e.key === " ") {
@@ -101,7 +101,7 @@ export function Trainer({
             Start
           </Button>
         )}
-        <Button className="ml-3" onClick={onClose}>
+        <Button variant="secondary" className="ml-3" onClick={onClose}>
           Cancel
         </Button>
       </div>

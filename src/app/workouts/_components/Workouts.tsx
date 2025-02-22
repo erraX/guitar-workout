@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { toast } from "sonner";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Exercise } from "@prisma/client";
-import { useDisclosure } from "@nextui-org/react";
 import { Button } from "@/components/ui/button";
 
 import { createWorkout } from "@/actions/workout";
@@ -32,7 +32,8 @@ export interface WorkoutsProps {
 }
 
 export function Workouts({ exercises }: WorkoutsProps) {
-  const finishedConfirmModal = useDisclosure();
+  const [finishedConfirmModalOpen, setFinishedConfirmModalOpen] =
+    useState(false);
 
   const clear = useWorkoutsStore((state) => state.clear);
   const addExercise = useWorkoutsStore((state) => state.addExercise);
@@ -59,9 +60,9 @@ export function Workouts({ exercises }: WorkoutsProps) {
       })),
     });
     if (!result.success) {
-      console.log("create workout error", result.error);
+      toast.error("Failed to create workout");
     } else {
-      alert("Create workout successfully!");
+      toast.success("Workout created successfully!");
     }
   }, [time, workoutExercises, stop]);
 
@@ -75,7 +76,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
           <StopWatch
             time={time}
             isRunning={isRunning}
-            onStop={finishedConfirmModal.onOpen}
+            onStop={() => setFinishedConfirmModalOpen(true)}
             onStart={start}
           />
         </div>
@@ -109,7 +110,8 @@ export function Workouts({ exercises }: WorkoutsProps) {
         </div>
       </div>
       <FinishConfirmModal
-        modal={finishedConfirmModal}
+        open={finishedConfirmModalOpen}
+        onOpenChange={setFinishedConfirmModalOpen}
         onStop={handleStop}
         onAbort={abort}
       />
