@@ -1,9 +1,29 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { exerciseCategories } from "@/app/_configs/exercise-categories";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 export interface ExerciseValues {
   name?: string;
@@ -11,6 +31,15 @@ export interface ExerciseValues {
   description?: string;
   category?: string;
 }
+
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  link: z.string(),
+  description: z.string(),
+  category: z.string(),
+});
 
 export default function ExerciseForm({
   initialValues,
@@ -20,70 +49,102 @@ export default function ExerciseForm({
   onSubmit: (values: Required<ExerciseValues>) => void;
 }) {
   const router = useRouter();
-  const [values, setValues] = useState<Required<ExerciseValues>>({
-    name: "",
-    link: "",
-    description: "",
-    category: "",
-    ...initialValues,
+
+  const form = useForm<Required<ExerciseValues>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      link: "",
+      description: "",
+      category: "",
+      ...initialValues,
+    },
   });
 
-  const setFieldValue = (fieldName: keyof typeof values, value: string) => {
-    setValues((values) => ({
-      ...values,
-      [fieldName]: value,
-    }));
-  };
-
-  const handleSubmit = async () => {
-    onSubmit(values);
-  };
+  const isLoading = form.formState.isSubmitting;
 
   const handleBack = () => {
     router.back();
   };
 
   return (
-    <div className="flex w-full flex-col">
-      <Select
-        className="mb-5"
-        selectedKeys={[values.category]}
-        onChange={(evt) => setFieldValue("category", evt.target.value)}
-        items={exerciseCategories}
-        label="Category"
-        placeholder="Select an category"
-      >
-        {(category) => (
-          <SelectItem key={category.value}>{category.label}</SelectItem>
-        )}
-      </Select>
-      <Input
-        className="mb-5"
-        type="name"
-        label="Name"
-        value={values.name}
-        onChange={(evt) => setFieldValue("name", evt.target.value)}
-      />
-      <Input
-        className="mb-5"
-        type="link"
-        label="Link"
-        value={values.link}
-        onChange={(evt) => setFieldValue("link", evt.target.value)}
-      />
-      <Input
-        className="mb-5"
-        type="description"
-        label="Description"
-        value={values.description}
-        onChange={(evt) => setFieldValue("description", evt.target.value)}
-      />
-      <div className="flex">
-        <Button className="mr-5" color="primary" onClick={handleSubmit}>
-          Submit
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 w-full">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Exercise name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {exerciseCategories.map((category) => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="link"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Link</FormLabel>
+              <FormControl>
+                <Input placeholder="Exercise link" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Exercise description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="mr-4" disabled={isLoading}>
+          {/* FIXME: margin bottom exists when show loading icon */}
+          {isLoading && <Loader2 className="animate-spin" />}
+          {isLoading ? "Submitting..." : "Submit"}
         </Button>
-        <Button onClick={handleBack}>Back</Button>
-      </div>
-    </div>
+        <Button variant="secondary" onClick={handleBack}>
+          Back
+        </Button>
+      </form>
+    </Form>
   );
 }

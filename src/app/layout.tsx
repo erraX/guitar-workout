@@ -7,6 +7,7 @@ import { Providers } from "./providers";
 import { isAuthenticated } from "@/lib/auth";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Guitar workout",
@@ -38,6 +39,7 @@ export default async function RootLayout({
             </div>
           </SidebarProvider>
         </Providers>
+        <Toaster position="top-right" />
         <SpeedInsights />
       </body>
     </html>
