@@ -6,7 +6,12 @@ import {
   type ThemeInput,
 } from "react-activity-calendar";
 import { Workout } from "@prisma/client";
-import { Tooltip } from "@nextui-org/react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const gitHubTheme = {
   light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
@@ -24,10 +29,7 @@ export const ActivityCalendar = ({
 }: ActivityCalendarProps) => {
   const historyByDate = transformHistoryData(data);
 
-  console.log("historyByDate", historyByDate);
-
   const daysInARow = getNumOfConsecutiveDays(historyByDate);
-  console.log("daysInARow", daysInARow);
 
   const activities = eachDayOfInterval({
     start: new Date(year, 0, 1),
@@ -79,12 +81,14 @@ export const ActivityCalendar = ({
           }
 
           return (
-            <Tooltip
-              content={`${activity.count} minutes on ${activity.date}`}
-              placement="bottom"
-            >
-              {block}
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>{block}</TooltipTrigger>
+                <TooltipContent>
+                  <p>{`${activity.count} minutes on ${activity.date}`}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           );
         }}
       />

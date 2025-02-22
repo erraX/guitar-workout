@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-import { Button, Code } from "@nextui-org/react";
 import { Time } from "@/components/Time";
 import { useClock } from "@/hooks/useClock";
 import { useShortCuts } from "@/hooks/useShortCuts";
+import { Button } from "@/components/ui/button";
 
 export interface TrainerProps {
   exerciseName: string;
@@ -63,15 +63,16 @@ export function Trainer({
         {exerciseName} | Set No.{set?.setNo}
       </div>
       {set?.duration && (
-        <Code
-          className="text-2xl mb-3"
-          color={
+        <div
+          className={`text-2xl mb-3 font-mono ${
             // TODO: send notification if time is reached the duration
-            Number(clock.time) < Number(set.duration) ? "danger" : "success"
-          }
+            Number(clock.time) < Number(set.duration)
+              ? "text-red-500"
+              : "text-green-500"
+          }`}
         >
           Target: {set?.duration}s
-        </Code>
+        </div>
       )}
       <Time className="mb-3" seconds={clock.time} />
       <div>
