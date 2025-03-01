@@ -30,6 +30,8 @@ export function ExercisesTable({ data }: ExercisesTableProps) {
             <TableHead>NAME</TableHead>
             <TableHead>CATEGORY</TableHead>
             <TableHead>DESCRIPTION</TableHead>
+            <TableHead>TARGET BPM</TableHead>
+            <TableHead>STATUS</TableHead>
             <TableHead>ACTIONS</TableHead>
           </TableRow>
         </TableHeader>
@@ -47,6 +49,8 @@ export function ExercisesTable({ data }: ExercisesTableProps) {
               </TableCell>
               <TableCell>{exercise.category}</TableCell>
               <TableCell>{exercise.description}</TableCell>
+              <TableCell>{exercise.targetBpm}</TableCell>
+              <TableCell>{exercise.status}</TableCell>
               <TableCell>
                 <Button
                   size="icon"

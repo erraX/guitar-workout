@@ -132,5 +132,10 @@ function getNumOfConsecutiveDays(
     key = format(subDays(yesterday, offset++), "yyyy-MM-dd");
   }
 
+  const today = format(new Date(), "yyyy-MM-dd");
+  if (historyByDate.has(today) && result > 0) {
+    result++;
+  }
+
   return result;
 }

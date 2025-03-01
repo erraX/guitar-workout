@@ -33,16 +33,26 @@ export const archiveExercise = async (id: number) => {
 
 export const updateExercise = async (
   id: number,
-  exercise: { name?: string; description?: string; link?: string }
+  exercise: {
+    name?: string;
+    description?: string;
+    link?: string;
+    targetBpm?: number | string | null;
+  }
 ) => {
+  console.log("update exercise", id, exercise);
   try {
     const result = await prisma.exercise.update({
       where: { id },
-      data: exercise,
+      data: {
+        ...exercise,
+        targetBpm: exercise.targetBpm ? Number(exercise.targetBpm) : undefined,
+      },
     });
     revalidatePath("/exercises");
     return { success: true, data: result };
   } catch (error) {
+    console.log("update exercise error", error);
     return { success: false, error: error };
   }
 };

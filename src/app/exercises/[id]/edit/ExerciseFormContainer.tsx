@@ -32,6 +32,7 @@ export default function ExerciseFormContainer({
         link: exercise.link ?? "",
         description: exercise.description ?? "",
         category: exercise.category ?? "",
+        targetBpm: exercise.targetBpm || undefined,
       }}
       onSubmit={handleSubmit}
     />

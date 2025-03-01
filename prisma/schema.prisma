@@ -19,6 +19,7 @@ model Exercise {
   workouts    WorkoutExercise[]
   createdAt   DateTime        @default(now())
   status      String          @default("ACTIVE")
+  targetBpm   Int?
 }
 
 model Workout {

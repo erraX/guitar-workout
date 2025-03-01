@@ -30,6 +30,7 @@ export interface ExerciseValues {
   link?: string;
   description?: string;
   category?: string;
+  targetBpm?: number;
 }
 
 const formSchema = z.object({
@@ -39,6 +40,7 @@ const formSchema = z.object({
   link: z.string(),
   description: z.string(),
   category: z.string(),
+  targetBpm: z.number().optional(),
 });
 
 export default function ExerciseForm({
@@ -51,12 +53,13 @@ export default function ExerciseForm({
   const router = useRouter();
 
   const form = useForm<Required<ExerciseValues>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: "",
       link: "",
       description: "",
       category: "",
+      targetBpm: undefined,
       ...initialValues,
     },
   });
@@ -132,6 +135,29 @@ export default function ExerciseForm({
                 <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Input placeholder="Exercise description" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="targetBpm"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Target BPM</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Target BPM"
+                    value={field.value || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "" || !isNaN(Number(value))) {
+                        field.onChange(Number(value));
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
