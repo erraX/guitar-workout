@@ -31,6 +31,7 @@ export interface ExerciseValues {
   description?: string;
   category?: string;
   targetBpm?: number;
+  currentBpm?: number;
 }
 
 const formSchema = z.object({
@@ -41,6 +42,7 @@ const formSchema = z.object({
   description: z.string(),
   category: z.string(),
   targetBpm: z.number().optional(),
+  currentBpm: z.number().optional(),
 });
 
 export default function ExerciseForm({
@@ -60,6 +62,7 @@ export default function ExerciseForm({
       description: "",
       category: "",
       targetBpm: undefined,
+      currentBpm: undefined,
       ...initialValues,
     },
   });
@@ -150,6 +153,29 @@ export default function ExerciseForm({
                   <Input
                     {...field}
                     placeholder="Target BPM"
+                    value={field.value || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "" || !isNaN(Number(value))) {
+                        field.onChange(Number(value));
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="currentBpm"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Current BPM</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Current BPM"
                     value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value;

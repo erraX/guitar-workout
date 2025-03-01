@@ -33,6 +33,7 @@ export default function ExerciseFormContainer({
         description: exercise.description ?? "",
         category: exercise.category ?? "",
         targetBpm: exercise.targetBpm || undefined,
+        currentBpm: exercise.currentBpm || undefined,
       }}
       onSubmit={handleSubmit}
     />

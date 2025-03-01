@@ -14,6 +14,7 @@ export const createExercise = async (exercise: {
     revalidatePath("/exercises");
     return { success: true, data: result };
   } catch (error) {
+    console.log("create exercise error", error);
     return { success: false, error: error };
   }
 };
@@ -27,6 +28,7 @@ export const archiveExercise = async (id: number) => {
     revalidatePath("/exercises");
     return { success: true, data: result };
   } catch (error) {
+    console.log("archive exercise error", error);
     return { success: false, error: error };
   }
 };
@@ -38,15 +40,18 @@ export const updateExercise = async (
     description?: string;
     link?: string;
     targetBpm?: number | string | null;
+    currentBpm?: number | string | null;
   }
 ) => {
-  console.log("update exercise", id, exercise);
   try {
     const result = await prisma.exercise.update({
       where: { id },
       data: {
         ...exercise,
         targetBpm: exercise.targetBpm ? Number(exercise.targetBpm) : undefined,
+        currentBpm: exercise.currentBpm
+          ? Number(exercise.currentBpm)
+          : undefined,
       },
     });
     revalidatePath("/exercises");
