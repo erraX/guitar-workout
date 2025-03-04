@@ -43,7 +43,7 @@ export function WeeklyInsightsChart({
     <div className="w-full">
       <div className="text-lg font-medium mb-3">Weekly insights</div>
       <div className="text-sm text-gray-500 mb-3">
-        You've practiced {baseTotalDurationHours} hours(
+        You&apos;ve practiced {baseTotalDurationHours} hours(
         {baseTotalDurationHoursPerDay} h/day) in this week, comparing to{" "}
         {prevTotalDurationHours} hours ({prevTotalDurationHoursPerDay} h/day)
       </div>
