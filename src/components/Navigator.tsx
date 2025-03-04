@@ -4,7 +4,13 @@ import { Alumni_Sans } from "next/font/google";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Calendar, ListChecks, Dumbbell, Plus } from "lucide-react";
+import {
+  Calendar,
+  ListChecks,
+  Dumbbell,
+  Plus,
+  LayoutDashboard,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -24,6 +30,11 @@ import {
 const inter = Alumni_Sans({ subsets: ["latin"] });
 
 const items = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+  },
   {
     title: "Workouts",
     url: "/workouts",
