@@ -1,56 +1,28 @@
 import { startOfWeek, endOfWeek, subWeeks } from "date-fns";
-import { getWorkouts } from "@/service/workout";
+import { getWorkouts, type Workout } from "@/service/workout";
 import { ActivityCalendar } from "./ActivityCalendar";
 import { WeeklyInsightsChart } from "./WeeklyInsightsChart";
+import { TopExercisesChart } from "./TopExercisesChart";
+import { WorkoutDatePicker } from "./WorkoutDatePicker";
 
-export default async function DashboardPage() {
-  const workouts = await getWorkouts();
-  console.log("workouts", workouts);
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date: string }>;
+}) {
+  const { date } = await searchParams;
+  const selectedDate = date ? new Date(date) : new Date();
 
-  const startOfWeekThis = startOfWeek(new Date(), { weekStartsOn: 1 });
-  const endOfWeekThis = endOfWeek(new Date(), { weekStartsOn: 1 });
-  const workoutsInThisWeek = workouts.filter((workout) => {
-    const workoutDate = new Date(workout.createdAt);
-    return workoutDate >= startOfWeekThis && workoutDate <= endOfWeekThis;
-  });
+  const [allWorkouts, curWeekWorkouts, lastWeekWorkouts] = await Promise.all([
+    getWorkouts(),
+    getWorkouts(getWeekDateRange(selectedDate, 0)),
+    getWorkouts(getWeekDateRange(selectedDate, 1)),
+  ]);
 
-  const startOfWeekLast = startOfWeek(subWeeks(new Date(), 1), {
-    weekStartsOn: 1,
-  });
-  const endOfWeekLast = endOfWeek(subWeeks(new Date(), 1), {
-    weekStartsOn: 1,
-  });
-  const workoutsInLastWeek = workouts.filter((workout) => {
-    const workoutDate = new Date(workout.createdAt);
-    return workoutDate >= startOfWeekLast && workoutDate <= endOfWeekLast;
-  });
-
-  const weeklyInsightsThisWeekDurationMap = new Map<string, number>();
-  for (const workout of workoutsInThisWeek) {
-    const workoutDate = new Date(workout.createdAt);
-    const day = workoutDate.toLocaleDateString("en-US", { weekday: "short" });
-    if (!weeklyInsightsThisWeekDurationMap.has(day)) {
-      weeklyInsightsThisWeekDurationMap.set(day, workout.duration);
-    } else {
-      weeklyInsightsThisWeekDurationMap.set(
-        day,
-        weeklyInsightsThisWeekDurationMap.get(day)! + workout.duration
-      );
-    }
-  }
-  const weeklyInsightsLastWeekDurationMap = new Map<string, number>();
-  for (const workout of workoutsInLastWeek) {
-    const workoutDate = new Date(workout.createdAt);
-    const day = workoutDate.toLocaleDateString("en-US", { weekday: "short" });
-    if (!weeklyInsightsLastWeekDurationMap.has(day)) {
-      weeklyInsightsLastWeekDurationMap.set(day, workout.duration);
-    } else {
-      weeklyInsightsLastWeekDurationMap.set(
-        day,
-        weeklyInsightsLastWeekDurationMap.get(day)! + workout.duration
-      );
-    }
-  }
+  const weeklyInsightsThisWeekDurationMap =
+    getDurationMapByDay(curWeekWorkouts);
+  const weeklyInsightsLastWeekDurationMap =
+    getDurationMapByDay(lastWeekWorkouts);
 
   const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const weeklyInsightsChartData = weekDays.map((day) => ({
@@ -63,20 +35,91 @@ export default async function DashboardPage() {
     ),
   }));
 
+  const topExercisesThisWeek = Object.values(
+    curWeekWorkouts.reduce(
+      (result, workout) => {
+        const exercises = workout.exercises;
+        for (const exercise of exercises) {
+          const existing = result[exercise.exercise.id];
+          if (existing) {
+            existing.duration += exercise.sets.reduce(
+              (acc, set) => acc + set.duration,
+              0
+            );
+          } else {
+            result[exercise.exercise.id] = {
+              id: exercise.exercise.id.toString(),
+              name: exercise.exercise.name,
+              duration: exercise.sets.reduce(
+                (acc, set) => acc + set.duration,
+                0
+              ),
+            };
+          }
+        }
+        return result;
+      },
+      {} as {
+        id: string;
+        name: string;
+        duration: number;
+      }[]
+    )
+  )
+    .sort((a, b) => b.duration - a.duration)
+    .slice(0, 5);
+
   return (
     <div className="flex flex-col w-full">
-      <ActivityCalendar data={workouts} />
-      <WeeklyInsightsChart
-        chartData={weeklyInsightsChartData}
-        baseTotalDuration={workoutsInThisWeek.reduce(
-          (acc, workout) => acc + workout.duration,
-          0
-        )}
-        prevTotalDuration={workoutsInLastWeek.reduce(
-          (acc, workout) => acc + workout.duration,
-          0
-        )}
-      />
+      <div className="flex justify-center">
+        <ActivityCalendar data={allWorkouts} />
+      </div>
+      <div className="flex justify-center mb-5">
+        <WorkoutDatePicker date={date} />
+      </div>
+      <div className="flex flex-row gap-5 justify-center">
+        <div>
+          <WeeklyInsightsChart
+            chartData={weeklyInsightsChartData}
+            baseTotalDuration={curWeekWorkouts.reduce(
+              (acc, workout) => acc + workout.duration,
+              0
+            )}
+            prevTotalDuration={lastWeekWorkouts.reduce(
+              (acc, workout) => acc + workout.duration,
+              0
+            )}
+          />
+        </div>
+        <div>
+          <TopExercisesChart chartData={topExercisesThisWeek} />
+        </div>
+      </div>
     </div>
   );
+}
+
+function getDurationMapByDay(workouts: Workout[]) {
+  const durationMap = new Map<string, number>();
+  for (const workout of workouts) {
+    const workoutDate = new Date(workout.createdAt);
+    const day = workoutDate.toLocaleDateString("en-US", { weekday: "short" });
+    if (!durationMap.has(day)) {
+      durationMap.set(day, workout.duration);
+    } else {
+      durationMap.set(day, durationMap.get(day)! + workout.duration);
+    }
+  }
+  return durationMap;
+}
+
+function getWeekDateRange(baseDay = new Date(), weekOffset: number = 0) {
+  return {
+    startDate: startOfWeek(subWeeks(baseDay, weekOffset), {
+      weekStartsOn: 1,
+    }),
+    endDate: endOfWeek(subWeeks(baseDay, weekOffset), {
+      weekStartsOn: 1,
+    }),
+  };
 }

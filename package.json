@@ -41,6 +41,7 @@
     "prisma": "5.16.1",
     "react": "^18",
     "react-activity-calendar": "^2.7.8",
+    "react-day-picker": "8.10.1",
     "react-dom": "^18",
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.1",

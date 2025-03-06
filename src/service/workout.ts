@@ -29,8 +29,17 @@ export const getWorkoutHistory = async () => {
   }));
 };
 
-export const getWorkouts = async () => {
+export const getWorkouts = async (filters?: {
+  startDate?: Date;
+  endDate?: Date;
+}) => {
   const workouts = await prisma.workout.findMany({
+    where: {
+      createdAt: {
+        gte: filters?.startDate,
+        lte: filters?.endDate,
+      },
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -44,8 +53,20 @@ export const getWorkouts = async () => {
     },
   });
 
-  return workouts;
+  return workouts.map((workout) => ({
+    ...workout,
+    exercises: workout.exercises.map((workoutExercise) => ({
+      ...workoutExercise,
+      sets: workoutExercise.sets.map((set) => ({ ...set })),
+      topBpm: Math.max(...workoutExercise.sets.map((set) => set.bpm)),
+      averageBpm:
+        workoutExercise.sets.reduce((acc, set) => acc + set.bpm, 0) /
+        workoutExercise.sets.length,
+    })),
+  }));
 };
+
+export type Workout = Awaited<ReturnType<typeof getWorkouts>>[number];
 
 export const getWorkoutById = async (workoutId: number) => {
   const workout = await prisma.workout.findUnique({

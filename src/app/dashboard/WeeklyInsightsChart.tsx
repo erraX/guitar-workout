@@ -40,14 +40,15 @@ export function WeeklyInsightsChart({
   );
 
   return (
-    <div className="w-full">
+    <div className="min-h-[200px] w-[400px]">
       <div className="text-lg font-medium mb-3">Weekly insights</div>
       <div className="text-sm text-gray-500 mb-3">
         You&apos;ve practiced {baseTotalDurationHours} hours(
-        {baseTotalDurationHoursPerDay} h/day) in this week, comparing to{" "}
+        {baseTotalDurationHoursPerDay} h/day) in this week,
         {prevTotalDurationHours} hours ({prevTotalDurationHoursPerDay} h/day)
+        last week
       </div>
-      <ChartContainer config={chartConfig} className="min-h-[200px] w-[500px]">
+      <ChartContainer config={chartConfig}>
         <BarChart accessibilityLayer data={chartData}>
           <YAxis
             tickLine={false}
