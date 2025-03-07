@@ -81,9 +81,7 @@ export function Trainer({
             color="danger"
             onClick={handleEnd}
             onKeyDown={(e) => {
-              if (e.key === " ") {
-                handleEnd();
-              }
+              e.stopPropagation();
             }}
           >
             End
@@ -93,9 +91,7 @@ export function Trainer({
             variant="success"
             onClick={handleStart}
             onKeyDown={(e) => {
-              if (e.key === " ") {
-                handleStart();
-              }
+              e.stopPropagation();
             }}
           >
             Start
