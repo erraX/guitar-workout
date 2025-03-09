@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const gitHubTheme = {
   light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
@@ -27,6 +28,7 @@ export const ActivityCalendar = ({
   year = 2025,
   data,
 }: ActivityCalendarProps) => {
+  const isMobile = useIsMobile();
   const historyByDate = transformHistoryData(data);
 
   const daysInARow = getNumOfConsecutiveDays(historyByDate);
@@ -68,6 +70,10 @@ export const ActivityCalendar = ({
       <ActivityCalendarComponent
         data={activities}
         weekStart={1}
+        blockSize={isMobile ? 6 : 12}
+        blockMargin={isMobile ? 2 : 4}
+        blockRadius={isMobile ? 2 : 2}
+        fontSize={isMobile ? 12 : 14}
         theme={gitHubTheme}
         labels={{
           totalCount:

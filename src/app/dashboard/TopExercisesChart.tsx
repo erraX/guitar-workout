@@ -22,7 +22,7 @@ export function TopExercisesChart({
   chartData: { name: string; duration: number }[];
 }) {
   return (
-    <div className="w-full">
+    <div>
       <div className="text-lg font-medium mb-3">Top Exercises</div>
       <div className="text-sm text-gray-500 mb-3">
         The top 5 exercises you played this week.

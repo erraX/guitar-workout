@@ -77,23 +77,19 @@ export default async function DashboardPage({
       <div className="flex justify-center mb-5">
         <WorkoutDatePicker date={date} />
       </div>
-      <div className="flex flex-row gap-5 justify-center">
-        <div>
-          <WeeklyInsightsChart
-            chartData={weeklyInsightsChartData}
-            baseTotalDuration={curWeekWorkouts.reduce(
-              (acc, workout) => acc + workout.duration,
-              0
-            )}
-            prevTotalDuration={lastWeekWorkouts.reduce(
-              (acc, workout) => acc + workout.duration,
-              0
-            )}
-          />
-        </div>
-        <div>
-          <TopExercisesChart chartData={topExercisesThisWeek} />
-        </div>
+      <div className="flex flex-col gap-5 justify-center items-center">
+        <WeeklyInsightsChart
+          chartData={weeklyInsightsChartData}
+          baseTotalDuration={curWeekWorkouts.reduce(
+            (acc, workout) => acc + workout.duration,
+            0
+          )}
+          prevTotalDuration={lastWeekWorkouts.reduce(
+            (acc, workout) => acc + workout.duration,
+            0
+          )}
+        />
+        <TopExercisesChart chartData={topExercisesThisWeek} />
       </div>
     </div>
   );
