@@ -4,7 +4,6 @@ import { ActivityCalendar } from "./ActivityCalendar";
 import { WeeklyInsightsChart } from "./WeeklyInsightsChart";
 import { TopExercisesChart } from "./TopExercisesChart";
 import { WorkoutDatePicker } from "./WorkoutDatePicker";
-
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -71,7 +70,7 @@ export default async function DashboardPage({
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex justify-center">
+      <div className="flex justify-center flex-col mb-5">
         <ActivityCalendar data={allWorkouts} />
       </div>
       <div className="flex justify-center mb-5">
