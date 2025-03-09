@@ -1,7 +1,7 @@
 "use client";
 
-import { Alumni_Sans } from "next/font/google";
 import Link from "next/link";
+import { Alumni_Sans } from "next/font/google";
 import { usePathname } from "next/navigation";
 
 import {
@@ -29,7 +29,7 @@ import {
 
 const inter = Alumni_Sans({ subsets: ["latin"] });
 
-const items = [
+const NAV_ITEMS = [
   {
     title: "Dashboard",
     url: "/dashboard",
@@ -75,9 +75,13 @@ export function Navigator() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {NAV_ITEMS.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isSubRoute(item.url)}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isSubRoute(item.url)}
+                    className="h-10"
+                  >
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -90,6 +94,7 @@ export function Navigator() {
                           <SidebarMenuSubButton
                             asChild
                             isActive={isSubRoute(subItem.url)}
+                            className="h-10"
                           >
                             <Link href={subItem.url}>
                               <subItem.icon />

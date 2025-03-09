@@ -6,7 +6,7 @@ import { Navigator } from "../components/Navigator";
 import { Providers } from "./providers";
 import { isAuthenticated } from "@/lib/auth";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -35,7 +35,8 @@ export default async function RootLayout({
           <SidebarProvider>
             <div className="w-screen flex flex-row">
               {showNavigator && <Navigator />}
-              <main className="pt-5 px-6 flex flex-1">{children}</main>
+              <SidebarTrigger className="absolute top-2 left-2" />
+              <main className="mt-5 pt-5 px-6 flex flex-1">{children}</main>
             </div>
           </SidebarProvider>
         </Providers>
