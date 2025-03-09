@@ -28,6 +28,7 @@ export interface ActivityCalendarProps {
   className?: string;
   year?: number;
   theme?: ThemeType;
+  title?: string;
   activities: Array<Activity>;
   renderBlockTooltip?: (activity: Activity) => React.ReactNode;
 }
@@ -43,6 +44,7 @@ export function ActivityCalendar({
   className,
   year = getCurrentYear(),
   theme = "github",
+  title = "Activity Calendar",
   activities,
   renderBlockTooltip = (activity) =>
     `${activity.count} minutes on ${activity.date}`,
@@ -85,34 +87,39 @@ export function ActivityCalendar({
 
   const renderCalendar = (data: Activity[], compact = false) => {
     return (
-      <_ActivityCalendar
-        data={data}
-        weekStart={1}
-        theme={THEMES[theme]}
-        blockSize={compact ? 10 : 12}
-        labels={{
-          totalCount:
-            daysInARow > 0
-              ? `You've been active for ${daysInARow} days in a row, keep it up!`
-              : " ",
-        }}
-        renderBlock={(block, activity) => {
-          if (activity.count === 0) {
-            return block;
-          }
+      <div>
+        <div className="text-lg font-medium mb-3">{title}</div>
+        <_ActivityCalendar
+          data={data}
+          weekStart={1}
+          theme={THEMES[theme]}
+          blockSize={compact ? 8 : 12}
+          blockMargin={compact ? 3 : 4}
+          fontSize={compact ? 12 : 14}
+          labels={{
+            totalCount:
+              daysInARow > 0
+                ? `You've been active for ${daysInARow} days in a row, keep it up!`
+                : " ",
+          }}
+          renderBlock={(block, activity) => {
+            if (activity.count === 0) {
+              return block;
+            }
 
-          return (
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>{block}</TooltipTrigger>
-                <TooltipContent>
-                  <p>{renderBlockTooltip(activity)}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          );
-        }}
-      />
+            return (
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>{block}</TooltipTrigger>
+                  <TooltipContent>
+                    <p>{renderBlockTooltip(activity)}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          }}
+        />
+      </div>
     );
   };
 

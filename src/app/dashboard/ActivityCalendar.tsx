@@ -10,7 +10,12 @@ export interface ActivityCalendarProps {
 }
 
 export function ActivityCalendar({ data }: ActivityCalendarProps) {
-  return <_ActivityCalendar activities={transformHistoryData(data)} />;
+  return (
+    <_ActivityCalendar
+      title="Workout Calendar"
+      activities={transformHistoryData(data)}
+    />
+  );
 }
 
 function transformHistoryData(data: Workout[]): Activity[] {
