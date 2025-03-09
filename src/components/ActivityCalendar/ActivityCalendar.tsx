@@ -83,12 +83,13 @@ export function ActivityCalendar({
     });
   }, [allDates, activityByDate]);
 
-  const renderCalendar = (data: Activity[]) => {
+  const renderCalendar = (data: Activity[], compact = false) => {
     return (
       <_ActivityCalendar
         data={data}
         weekStart={1}
         theme={THEMES[theme]}
+        blockSize={compact ? 8 : 12}
         labels={{
           totalCount:
             daysInARow > 0
@@ -120,10 +121,12 @@ export function ActivityCalendar({
       {isMobile ? (
         <div className="flex flex-col gap-4">
           {renderCalendar(
-            _activities.filter((a) => new Date(a.date).getMonth() < 6)
+            _activities.filter((a) => new Date(a.date).getMonth() < 6),
+            true
           )}
           {renderCalendar(
-            _activities.filter((a) => new Date(a.date).getMonth() >= 6)
+            _activities.filter((a) => new Date(a.date).getMonth() >= 6),
+            true
           )}
         </div>
       ) : (
