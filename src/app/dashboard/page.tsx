@@ -1,9 +1,8 @@
 import { startOfWeek, endOfWeek, subWeeks } from "date-fns";
 import { getWorkouts, type Workout } from "@/service/workout";
 import { ActivityCalendar } from "./ActivityCalendar";
-import { WeeklyInsightsChart } from "./WeeklyInsightsChart";
-import { TopExercisesChart } from "./TopExercisesChart";
-import { WorkoutDatePicker } from "./WorkoutDatePicker";
+import { Insights } from "./Insights";
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -73,22 +72,14 @@ export default async function DashboardPage({
       <div className="flex justify-center flex-col mb-5">
         <ActivityCalendar data={allWorkouts} />
       </div>
-      <div className="flex justify-center mb-5">
-        <WorkoutDatePicker date={date} />
-      </div>
-      <div className="flex flex-col gap-5 justify-center items-center">
-        <WeeklyInsightsChart
-          chartData={weeklyInsightsChartData}
-          baseTotalDuration={curWeekWorkouts.reduce(
-            (acc, workout) => acc + workout.duration,
-            0
-          )}
-          prevTotalDuration={lastWeekWorkouts.reduce(
-            (acc, workout) => acc + workout.duration,
-            0
-          )}
+      <div>
+        <Insights
+          date={date}
+          weeklyInsightsChartData={weeklyInsightsChartData}
+          topExercisesThisWeek={topExercisesThisWeek}
+          curWeekWorkouts={curWeekWorkouts}
+          lastWeekWorkouts={lastWeekWorkouts}
         />
-        <TopExercisesChart chartData={topExercisesThisWeek} />
       </div>
     </div>
   );

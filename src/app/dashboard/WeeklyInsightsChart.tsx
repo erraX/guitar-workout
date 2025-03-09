@@ -7,11 +7,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 
 export interface WeeklyInsightsChartProps {
   baseTotalDuration: number;
   prevTotalDuration: number;
   chartData: { day: string; base: number; prev: number }[];
+  compact?: boolean;
 }
 
 const chartConfig = {
@@ -29,6 +31,7 @@ export function WeeklyInsightsChart({
   baseTotalDuration,
   prevTotalDuration,
   chartData,
+  compact = false,
 }: WeeklyInsightsChartProps) {
   const baseTotalDurationHours = Number((baseTotalDuration / 3600).toFixed(1));
   const prevTotalDurationHours = Number((prevTotalDuration / 3600).toFixed(1));
@@ -40,7 +43,12 @@ export function WeeklyInsightsChart({
   );
 
   return (
-    <div className="min-h-[200px] w-[400px]">
+    <div
+      className={cn("min-h-[200px]", {
+        "w-[400px]": !compact,
+        "w-[350px]": compact,
+      })}
+    >
       <div className="text-lg font-medium mb-3">Weekly insights</div>
       <div className="text-sm text-gray-500 mb-3">
         You&apos;ve practiced {baseTotalDurationHours} hours(

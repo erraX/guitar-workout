@@ -8,6 +8,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 
 const chartConfig = {
   duration: {
@@ -18,8 +19,10 @@ const chartConfig = {
 
 export function TopExercisesChart({
   chartData,
+  compact = false,
 }: {
   chartData: { name: string; duration: number }[];
+  compact?: boolean;
 }) {
   return (
     <div>
@@ -27,7 +30,13 @@ export function TopExercisesChart({
       <div className="text-sm text-gray-500 mb-3">
         The top 5 exercises you played this week.
       </div>
-      <ChartContainer config={chartConfig} className="min-h-[200px] w-[400px]">
+      <ChartContainer
+        config={chartConfig}
+        className={cn("min-h-[200px]", {
+          "w-[400px]": !compact,
+          "w-[350px]": compact,
+        })}
+      >
         <BarChart
           accessibilityLayer
           data={chartData}
