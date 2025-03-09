@@ -89,7 +89,7 @@ export function ActivityCalendar({
         data={data}
         weekStart={1}
         theme={THEMES[theme]}
-        blockSize={compact ? 8 : 12}
+        blockSize={compact ? 10 : 12}
         labels={{
           totalCount:
             daysInARow > 0
