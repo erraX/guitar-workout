@@ -85,10 +85,16 @@ export function ActivityCalendar({
     });
   }, [allDates, activityByDate]);
 
-  const renderCalendar = (data: Activity[], compact = false) => {
+  const renderCalendar = (
+    data: Activity[],
+    compact = false,
+    isSubCalendar = false
+  ) => {
     return (
       <div>
-        <div className="text-lg font-medium mb-3">{title}</div>
+        {!isSubCalendar && (
+          <div className="text-lg font-medium mb-3">{title}</div>
+        )}
         <_ActivityCalendar
           data={data}
           weekStart={1}
@@ -98,7 +104,7 @@ export function ActivityCalendar({
           fontSize={compact ? 12 : 14}
           labels={{
             totalCount:
-              daysInARow > 0
+              !isSubCalendar && daysInARow > 0
                 ? `You've been active for ${daysInARow} days in a row, keep it up!`
                 : " ",
           }}
@@ -129,10 +135,12 @@ export function ActivityCalendar({
         <div className="flex flex-col gap-4">
           {renderCalendar(
             _activities.filter((a) => new Date(a.date).getMonth() < 6),
-            true
+            true,
+            false
           )}
           {renderCalendar(
             _activities.filter((a) => new Date(a.date).getMonth() >= 6),
+            true,
             true
           )}
         </div>
