@@ -3,7 +3,7 @@ import { Workout } from "@prisma/client";
 import {
   ActivityCalendar as _ActivityCalendar,
   type Activity,
-} from "@/components/ActivityCalendar";
+} from "@/components/ui/activity-calendar";
 
 export interface ActivityCalendarProps {
   data: Workout[];

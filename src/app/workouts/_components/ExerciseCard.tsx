@@ -1,8 +1,8 @@
 import { memo, useRef } from "react";
 import { ExerciseSet } from "@/types";
 import { createEmptySet } from "@/utils/create-empty-set";
-import { NumberInput } from "@/components/NumberInput";
-import { NativeTable } from "@/components/NativeTable";
+import { NumberInput } from "@/components/ui/number-input";
+import { NativeTable } from "@/components/ui/native-table";
 import { Trainer } from "@/components/Trainer";
 import {
   DropdownMenu,

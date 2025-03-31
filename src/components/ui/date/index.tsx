@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const DateNoSSR = dynamic(() => import("./Date"), {
+const DateNoSSR = dynamic(() => import("./date"), {
   ssr: false,
   loading: () => <Skeleton className="w-full h-3" />,
 });

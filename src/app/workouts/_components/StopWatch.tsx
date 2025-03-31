@@ -5,7 +5,7 @@ import { FC } from "react";
 import { CirclePlay, CircleStop } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { Time } from "@/components/Time";
+import { Time } from "@/components/ui/time";
 
 export interface StopWatchButtonProps {
   time: number;

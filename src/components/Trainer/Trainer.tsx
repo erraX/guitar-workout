@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Time } from "@/components/Time";
+import { Time } from "@/components/ui/time";
 import { useClock } from "@/hooks/useClock";
 import { useShortCuts } from "@/hooks/useShortCuts";
 import { Button } from "@/components/ui/button";

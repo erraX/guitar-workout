@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import { createWorkout } from "@/actions/workout";
 
-import { AddExercise } from "@/components/AddExercise";
+import { AddExercise } from "@/app/workouts/_components/AddExercise";
 import { ExerciseCard } from "./ExerciseCard";
 
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";

@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Workout } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { Date } from "@/components/Date";
+import { Date } from "@/components/ui/date";
 import { Badge } from "@/components/ui/badge";
 import { CirclePlay, Trash2 } from "lucide-react";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { DatePicker } from "@/components/DatePicker";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export function WorkoutDatePicker({ date }: { date?: string }) {
   return (

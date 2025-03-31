@@ -1,6 +1,6 @@
 import { memo, isValidElement } from "react";
 
-import type { TableProps } from "./NativeTable.types";
+import type { TableProps } from "./native-table.types";
 
 const _NativeTable = function NativeTable<
   TableRow extends Record<string, any>
@@ -40,4 +40,3 @@ const _NativeTable = function NativeTable<
 };
 
 export const NativeTable = memo(_NativeTable) as typeof _NativeTable;
-
