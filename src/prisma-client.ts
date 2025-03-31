@@ -1,9 +1,3 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.POSTGRES_PRISMA_URL + "?pgbouncer=true",
-    },
-  },
-});
+export const prisma = new PrismaClient();
