@@ -10,8 +10,9 @@
     "test": "vitest",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "migrate": "prisma migrate dev",
-    "postinstall": "prisma generate"
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "postinstall": "pnpm prisma:generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.0",
