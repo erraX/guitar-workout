@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getExercises } from "@/service/exercise";
 import { getWorkoutById } from "@/service/workout";
 import { Workouts } from "./_components/Workouts";
-import { WorkoutsStoreProvider } from "./_contexts/WorkoutsStoreContext";
+import { WorkoutExerciseStoreProvider } from "@/app/_store/workout-exercise-store";
 
 export default async function WorkoutsPage(props: {
   searchParams: Promise<{ workoutId: string }>;
@@ -18,7 +18,7 @@ export default async function WorkoutsPage(props: {
   const exercises = await getExercises();
 
   return (
-    <WorkoutsStoreProvider
+    <WorkoutExerciseStoreProvider
       initialState={
         workout
           ? {
@@ -41,6 +41,6 @@ export default async function WorkoutsPage(props: {
       }
     >
       <Workouts exercises={exercises} />
-    </WorkoutsStoreProvider>
+    </WorkoutExerciseStoreProvider>
   );
 }

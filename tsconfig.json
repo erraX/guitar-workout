@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "vitest.config.mts"
-, "src/app/workouts/_contexts/workoutsStore.ts"  ],
+, "src/app/_store/workout-exercise-store.ts"  ],
   "exclude": ["node_modules"]
 }

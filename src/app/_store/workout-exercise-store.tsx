@@ -1,3 +1,10 @@
+"use client";
+
+import type { ReactNode } from "react";
+import { useEffect } from "react";
+import { createContext, useContext, useRef } from "react";
+import { useStore } from "zustand";
+
 import { produce } from "immer";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
@@ -5,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import { createEmptySet } from "@/utils/create-empty-set";
 import type { Workout, ExerciseSet } from "@/types";
 
-type WorkoutsStoreActions = {
+type WorkoutExerciseStoreActions = {
   reset: (nextState: Omit<Workout, "id">) => void;
   clear: () => void;
 
@@ -35,11 +42,11 @@ type WorkoutsStoreActions = {
   duplicateSet: (exerciseId: string, setId: string) => void;
 };
 
-export type WorkoutsStoreState = Workout & WorkoutsStoreActions;
+type WorkoutExerciseStoreState = Workout & WorkoutExerciseStoreActions;
 
-export const createWorkoutsStore = () =>
+const createWorkoutExerciseStore = () =>
   create(
-    persist<WorkoutsStoreState>(
+    persist<WorkoutExerciseStoreState>(
       (set) => ({
         id: uuidv4(),
         name: "Default",
@@ -77,7 +84,7 @@ export const createWorkoutsStore = () =>
 
         addSet: (exerciseId, exerciseSet) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 exercise.sets.push(exerciseSet);
@@ -87,7 +94,7 @@ export const createWorkoutsStore = () =>
 
         deleteSet: (exerciseId, setId) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 exercise.sets = exercise.sets.filter((s) => s.id !== setId);
@@ -97,7 +104,7 @@ export const createWorkoutsStore = () =>
 
         updateSet: (exerciseId, setId, exerciseSet) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 const existingSet = exercise.sets.find((s) => s.id === setId);
@@ -110,7 +117,7 @@ export const createWorkoutsStore = () =>
 
         updateSetBpm: (exerciseId, setId, bpm) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 const existingSet = exercise.sets.find((s) => s.id === setId);
@@ -123,7 +130,7 @@ export const createWorkoutsStore = () =>
 
         updateSetDuration: (exerciseId, setId, duration) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 const existingSet = exercise.sets.find((s) => s.id === setId);
@@ -136,7 +143,7 @@ export const createWorkoutsStore = () =>
 
         updateSetIsFinished: (exerciseId, setId, isFinished) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 const existingSet = exercise.sets.find((s) => s.id === setId);
@@ -149,7 +156,7 @@ export const createWorkoutsStore = () =>
 
         updateNotes: (exerciseId, notes) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 exercise.notes = notes;
@@ -159,7 +166,7 @@ export const createWorkoutsStore = () =>
 
         completeAllSets: (exerciseId) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 exercise.sets.forEach((s) => (s.isFinished = true));
@@ -169,7 +176,7 @@ export const createWorkoutsStore = () =>
 
         duplicateSet: (exerciseId, setId) =>
           set(
-            produce<WorkoutsStoreState>((state) => {
+            produce<WorkoutExerciseStoreState>((state) => {
               const exercise = state.exercises.find((e) => e.id === exerciseId);
               if (exercise) {
                 const existingSet = exercise.sets.find((s) => s.id === setId);
@@ -191,4 +198,52 @@ export const createWorkoutsStore = () =>
     )
   );
 
-export type WorkoutsStore = ReturnType<typeof createWorkoutsStore>;
+export type WorkoutExerciseStore = ReturnType<
+  typeof createWorkoutExerciseStore
+>;
+
+const WorkoutExerciseStoreContext = createContext<WorkoutExerciseStore | null>(
+  null
+);
+
+export const WorkoutExerciseStoreProvider = ({
+  children,
+  initialState,
+}: {
+  children: ReactNode;
+  initialState?: Omit<Workout, "id">;
+}) => {
+  const storeRef = useRef<WorkoutExerciseStore>();
+  if (!storeRef.current) {
+    storeRef.current = createWorkoutExerciseStore();
+  }
+
+  useEffect(() => {
+    if (initialState && storeRef.current) {
+      storeRef.current.getState().reset(initialState);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <WorkoutExerciseStoreContext.Provider value={storeRef.current}>
+      {children}
+    </WorkoutExerciseStoreContext.Provider>
+  );
+};
+
+export function useWorkoutExerciseStore(): WorkoutExerciseStoreState;
+export function useWorkoutExerciseStore<T>(
+  selector: (state: WorkoutExerciseStoreState) => T
+): T;
+export function useWorkoutExerciseStore<T>(
+  selector?: (state: WorkoutExerciseStoreState) => T
+): T {
+  const store = useContext(WorkoutExerciseStoreContext);
+
+  if (!store) {
+    throw new Error("Missing `WorkoutsStoreProvider`");
+  }
+
+  return useStore(store, selector!);
+}

@@ -15,9 +15,8 @@ import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 
 import FinishConfirmModal from "./FinishConfirmModal";
 import StopWatch from "./StopWatch";
-import { useWorkoutsStore } from "../_contexts/WorkoutsStoreContext";
-
-import { useWorkoutTaskState } from "../_utils/useWorkoutTaskState";
+import { useWorkoutExerciseStore } from "@/app/_store/workout-exercise-store";
+import { useWorkoutTimerStore } from "@/app/_store/workout-timer-store";
 
 const getExerciseById = (exercises: Exercise[], id: number) =>
   exercises.findIndex((e) => e.id === id);
@@ -35,19 +34,18 @@ export function Workouts({ exercises }: WorkoutsProps) {
   const [finishedConfirmModalOpen, setFinishedConfirmModalOpen] =
     useState(false);
 
-  const clear = useWorkoutsStore((state) => state.clear);
-  const addExercise = useWorkoutsStore((state) => state.addExercise);
-  const duration = useWorkoutsStore((state) => state.duration);
-  const workoutExercises = useWorkoutsStore((state) => state.exercises);
+  const clear = useWorkoutExerciseStore((state) => state.clear);
+  const addExercise = useWorkoutExerciseStore((state) => state.addExercise);
+  const workoutExercises = useWorkoutExerciseStore((state) => state.exercises);
 
-  const { isRunning, time, start, abort, stop } = useWorkoutTaskState();
+  const timerStore = useWorkoutTimerStore();
 
   const handleStop = useCallback(async () => {
-    stop();
+    timerStore.stop();
 
     // TODO: Add loading
     const result = await createWorkout({
-      duration: time,
+      duration: timerStore.duration,
       exercises: workoutExercises.map((exercise) => ({
         id: Number(exercise.exerciseId),
         notes: exercise.notes,
@@ -64,9 +62,9 @@ export function Workouts({ exercises }: WorkoutsProps) {
     } else {
       toast.success("Workout created successfully!");
     }
-  }, [time, workoutExercises, stop]);
+  }, [timerStore, workoutExercises]);
 
-  useBeforeUnload(isRunning);
+  useBeforeUnload(timerStore.isRunning);
   useClearQueryParams();
 
   return (
@@ -74,10 +72,10 @@ export function Workouts({ exercises }: WorkoutsProps) {
       <div className="flex flex-col items-center w-full">
         <div className="flex justify-center items-center mb-6 w-full">
           <StopWatch
-            time={time}
-            isRunning={isRunning}
+            time={timerStore.duration}
+            isRunning={timerStore.isRunning}
             onStop={() => setFinishedConfirmModalOpen(true)}
-            onStart={start}
+            onStart={timerStore.start}
           />
         </div>
         <div className="flex flex-row w-full mb-6 justify-center">
@@ -113,7 +111,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
         open={finishedConfirmModalOpen}
         onOpenChange={setFinishedConfirmModalOpen}
         onStop={handleStop}
-        onAbort={abort}
+        onAbort={timerStore.abort}
       />
     </>
   );

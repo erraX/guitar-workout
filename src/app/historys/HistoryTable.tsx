@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { Date } from "@/components/ui/date";
 import { Badge } from "@/components/ui/badge";
 import { CirclePlay, Trash2 } from "lucide-react";
+import { useWorkoutTimerStore } from "../_store/workout-timer-store";
 
 export interface HistorysTableProps {
   data: Workout[];

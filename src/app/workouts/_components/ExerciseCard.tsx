@@ -22,7 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CirclePlay, Trash2, Settings, SquareCheck } from "lucide-react";
 import { FC, useState } from "react";
-import { useWorkoutsStore } from "../_contexts/WorkoutsStoreContext";
+import { useWorkoutExerciseStore } from "@/app/_store/workout-exercise-store";
 
 export interface ExerciseCardProps {
   id: string;
@@ -61,7 +61,7 @@ export const ExerciseCard: FC<ExerciseCardProps> = memo(function ExerciseCard({
   const setsRef = useRef(sets);
   setsRef.current = sets;
 
-  const updateNotes = useWorkoutsStore((state) => state.updateNotes);
+  const updateNotes = useWorkoutExerciseStore((state) => state.updateNotes);
 
   return (
     <>
@@ -252,7 +252,7 @@ const MarkSetFinishedButton = memo(function MarkSetFinishedButton({
   className?: string;
   isFinished: boolean;
 }) {
-  const _toggleFinished = useWorkoutsStore(
+  const _toggleFinished = useWorkoutExerciseStore(
     (state) => state.updateSetIsFinished
   );
 
@@ -316,8 +316,8 @@ const AddSetButton = memo(function AddSetButton({
 }: {
   exerciseId: string;
 }) {
-  const addSet = useWorkoutsStore((state) => state.addSet);
-  const lastSet = useWorkoutsStore((state) => {
+  const addSet = useWorkoutExerciseStore((state) => state.addSet);
+  const lastSet = useWorkoutExerciseStore((state) => {
     const exercise = state.exercises.find((e) => e.id === exerciseId);
     if (!exercise) return null;
     return exercise.sets[exercise.sets.length - 1];
@@ -345,7 +345,9 @@ const CompleteAllButton = memo(function CompleteAllButton({
 }: {
   exerciseId: string;
 }) {
-  const completeAllSets = useWorkoutsStore((state) => state.completeAllSets);
+  const completeAllSets = useWorkoutExerciseStore(
+    (state) => state.completeAllSets
+  );
 
   return (
     <Button
@@ -372,8 +374,10 @@ const BpmInput = memo(function BpmInput({
   value: string;
   onStart?: () => void;
 }) {
-  const updateBpm = useWorkoutsStore((state) => state.updateSetBpm);
-  const toggleFinished = useWorkoutsStore((state) => state.updateSetIsFinished);
+  const updateBpm = useWorkoutExerciseStore((state) => state.updateSetBpm);
+  const toggleFinished = useWorkoutExerciseStore(
+    (state) => state.updateSetIsFinished
+  );
 
   return (
     <NumberInput
@@ -405,8 +409,12 @@ const DurationInput = memo(function DurationInput({
   value: string;
   onStart?: () => void;
 }) {
-  const updateDuration = useWorkoutsStore((state) => state.updateSetDuration);
-  const toggleFinished = useWorkoutsStore((state) => state.updateSetIsFinished);
+  const updateDuration = useWorkoutExerciseStore(
+    (state) => state.updateSetDuration
+  );
+  const toggleFinished = useWorkoutExerciseStore(
+    (state) => state.updateSetIsFinished
+  );
 
   return (
     <NumberInput
@@ -439,7 +447,9 @@ const DeleteExerciseModal = memo(
     open: boolean;
     onOpenChange: (open: boolean) => void;
   }) {
-    const deleteExercise = useWorkoutsStore((state) => state.deleteExercise);
+    const deleteExercise = useWorkoutExerciseStore(
+      (state) => state.deleteExercise
+    );
 
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -488,17 +498,17 @@ const SetActions = memo(function SetActions({
   onClickOpenModal?: () => void;
   onSetCurTrainSet: (set: ExerciseSetRow) => void;
 }) {
-  const deleteSet = useWorkoutsStore((state) => state.deleteSet);
-  const duplicateSet = useWorkoutsStore((state) => state.duplicateSet);
+  const deleteSet = useWorkoutExerciseStore((state) => state.deleteSet);
+  const duplicateSet = useWorkoutExerciseStore((state) => state.duplicateSet);
 
-  const curSet = useWorkoutsStore((state) => {
+  const curSet = useWorkoutExerciseStore((state) => {
     const curSet = state.exercises
       .find((e) => e.id === exerciseId)
       ?.sets.find((s) => s.id === setId);
     return curSet;
   });
 
-  const curSetIndex = useWorkoutsStore((state) => {
+  const curSetIndex = useWorkoutExerciseStore((state) => {
     const exercise = state.exercises.find((e) => e.id === exerciseId);
     if (!exercise) return -1;
     return exercise.sets.findIndex((s) => s.id === setId);
@@ -561,8 +571,10 @@ const TrainerModal = memo(
     exerciseName: string;
     set: ExerciseSetRow | null;
   }) {
-    const updateDuration = useWorkoutsStore((state) => state.updateSetDuration);
-    const toggleFinished = useWorkoutsStore(
+    const updateDuration = useWorkoutExerciseStore(
+      (state) => state.updateSetDuration
+    );
+    const toggleFinished = useWorkoutExerciseStore(
       (state) => state.updateSetIsFinished
     );
 
