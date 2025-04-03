@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Exercise } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import { createWorkout } from "@/actions/workout";
 
 import { AddExercise } from "@/app/workouts/_components/AddExercise";
@@ -17,6 +18,7 @@ import FinishConfirmModal from "./FinishConfirmModal";
 import StopWatch from "./StopWatch";
 import { useWorkoutExerciseStore } from "@/app/_store/workout-exercise-store";
 import { useWorkoutTimerStore } from "@/app/_store/workout-timer-store";
+import { cn } from "@/lib/utils";
 
 const getExerciseById = (exercises: Exercise[], id: number) =>
   exercises.findIndex((e) => e.id === id);
@@ -31,6 +33,8 @@ export interface WorkoutsProps {
 }
 
 export function Workouts({ exercises }: WorkoutsProps) {
+  const isMobile = useIsMobile();
+
   const [finishedConfirmModalOpen, setFinishedConfirmModalOpen] =
     useState(false);
 
@@ -70,7 +74,7 @@ export function Workouts({ exercises }: WorkoutsProps) {
   return (
     <>
       <div className="flex flex-col items-center w-full">
-        <div className="flex justify-center items-center mb-6 w-full">
+        <div className="flex justify-center items-center mb-3 w-full">
           <StopWatch
             time={timerStore.duration}
             isRunning={timerStore.isRunning}
@@ -78,8 +82,16 @@ export function Workouts({ exercises }: WorkoutsProps) {
             onStart={timerStore.start}
           />
         </div>
-        <div className="flex flex-row w-full mb-6 justify-center">
+        <div
+          className={cn("flex w-full flex-row mb-6 justify-center", {
+            "flex-col": isMobile,
+          })}
+        >
           <AddExercise
+            className={cn({
+              "mb-3": isMobile,
+              "w-full": isMobile,
+            })}
             exercises={exercises}
             onAddExercises={(exerciseIds) => {
               exerciseIds.forEach((exerciseId) => {
@@ -87,7 +99,13 @@ export function Workouts({ exercises }: WorkoutsProps) {
               });
             }}
           />
-          <Button className="ml-3" variant="secondary" onClick={clear}>
+          <Button
+            className={cn({
+              "ml-3": !isMobile,
+            })}
+            variant="secondary"
+            onClick={clear}
+          >
             Clear
           </Button>
         </div>

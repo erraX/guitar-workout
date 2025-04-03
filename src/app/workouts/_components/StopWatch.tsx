@@ -3,8 +3,11 @@
 import { FC } from "react";
 
 import { CirclePlay, CircleStop } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+import { Button } from "@/components/ui/button";
 import { Time } from "@/components/ui/time";
 
 export interface StopWatchButtonProps {
@@ -15,20 +18,44 @@ export interface StopWatchButtonProps {
 }
 
 export default (function StopWatch({ time, isRunning, onStop, onStart }) {
-  // FIXME: alignment and icon size
+  const isMobile = useIsMobile();
+
+  const buttonSize = isMobile ? "w-full" : "w-10";
+
   const button = isRunning ? (
-    <Button size="icon" variant="destructive" onClick={onStop}>
+    <Button
+      className={cn(buttonSize)}
+      size="icon"
+      variant="destructive"
+      onClick={onStop}
+    >
       <CircleStop />
     </Button>
   ) : (
-    <Button size="icon" variant="success" onClick={onStart}>
+    <Button
+      className={cn(buttonSize)}
+      size="icon"
+      variant="success"
+      onClick={onStart}
+    >
       <CirclePlay />
     </Button>
   );
   return (
-    <div>
+    <div
+      className={cn("flex items-center justify-center w-full", {
+        "flex-col": isMobile,
+      })}
+    >
       <Time className="mr-3" seconds={time} />
-      {button}
+      <div
+        className={cn("flex", "items-center", {
+          "w-full": isMobile,
+          "mt-3": isMobile,
+        })}
+      >
+        {button}
+      </div>
     </div>
   );
 } as FC<StopWatchButtonProps>);

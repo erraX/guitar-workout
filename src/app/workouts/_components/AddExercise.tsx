@@ -3,17 +3,20 @@
 import { Exercise } from "@prisma/client";
 import { FC, useState } from "react";
 
+import { cn } from "@/lib/utils";
 import { AutoComplete } from "@/components/ui/auto-complete";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export interface AddExerciseProps {
   exercises: Exercise[];
+  className?: string;
   onAddExercises(exerciseIds: string[]): void;
 }
 
 export const AddExercise: FC<AddExerciseProps> = ({
   exercises,
+  className,
   onAddExercises,
 }) => {
   const [open, setOpen] = useState(false);
@@ -21,7 +24,10 @@ export const AddExercise: FC<AddExerciseProps> = ({
 
   return (
     <>
-      <Button className="mb-2 w-fit self-center" onClick={() => setOpen(true)}>
+      <Button
+        className={cn("self-center", className)}
+        onClick={() => setOpen(true)}
+      >
         Add Exercise
       </Button>
       <ConfirmDialog
