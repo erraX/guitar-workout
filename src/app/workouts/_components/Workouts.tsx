@@ -10,9 +10,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { createWorkout } from "@/actions/workout";
 
 import { AddExercise } from "@/app/workouts/_components/AddExercise";
-import { ExerciseSet as ExerciseSetType } from "@/types";
 
-// import { ExerciseCard } from "./ExerciseCard";
 import {
   ExerciseCard,
   ExerciseCardHeader,
@@ -20,6 +18,7 @@ import {
   ExerciseCardContent,
   ExerciseSet,
   ExerciseCardSetActions,
+  SetTrainer,
 } from "@/components/exercise-card";
 
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
@@ -123,8 +122,12 @@ export function Workouts({ exercises }: WorkoutsProps) {
           {workoutExercises.map((exercise) => (
             <ExerciseCard
               key={exercise.id}
-              exerciseId={exercise.id}
               className="mb-3"
+              exerciseId={exercise.id}
+              exerciseName={getExerciseNameById(
+                exercises,
+                Number(exercise.exerciseId)
+              )}
             >
               <ExerciseCardHeader>
                 <div className="flex flex-row justify-between items-center">
@@ -143,18 +146,8 @@ export function Workouts({ exercises }: WorkoutsProps) {
                 ))}
                 <ExerciseCardSetActions />
               </ExerciseCardContent>
+              <SetTrainer />
             </ExerciseCard>
-            // <ExerciseCard
-            //   key={exercise.id}
-            //   id={exercise.id}
-            //   notes={exercise.notes}
-            //   className="mb-3"
-            //   title={getExerciseNameById(
-            //     exercises,
-            //     Number(exercise.exerciseId)
-            //   )}
-            //   sets={exercise.sets}
-            // />
           ))}
         </div>
       </div>

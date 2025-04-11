@@ -28,18 +28,21 @@ import {
   useTrainerContext,
   TrainerContextProvider,
 } from "./trainer-context-provider";
+import { TrainerModal } from "./trainer-modal";
 
 export function ExerciseCard({
   exerciseId,
+  exerciseName,
   children,
   className,
 }: {
   exerciseId: string;
+  exerciseName: string;
   children: ReactNode;
   className?: string;
 }) {
   return (
-    <ExerciseCardProvider exerciseId={exerciseId}>
+    <ExerciseCardProvider exerciseId={exerciseId} exerciseName={exerciseName}>
       <TrainerContextProvider>
         <Card className={cn(className)}>{children}</Card>
       </TrainerContextProvider>
@@ -221,6 +224,23 @@ export function ExerciseCardHeaderActions() {
         <Trash2 />
       </Button>
     </div>
+  );
+}
+
+export function SetTrainer() {
+  const { exerciseId, exerciseName } = useExerciseCard();
+  const { currentSet, setCurrentSet } = useTrainerContext();
+
+  return (
+    <TrainerModal
+      exerciseId={exerciseId}
+      exerciseName={exerciseName}
+      set={currentSet}
+      open={!!currentSet}
+      onOpenChange={() => {
+        setCurrentSet(null);
+      }}
+    />
   );
 }
 

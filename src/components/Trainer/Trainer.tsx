@@ -13,7 +13,7 @@ export interface TrainerProps {
     bpm: string;
     duration: string;
     id: string;
-    setNo: number;
+    setNo?: number;
   } | null;
 }
 
@@ -59,9 +59,7 @@ export function Trainer({
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
-      <div className="text-2xl mb-3">
-        {exerciseName} | Set No.{set?.setNo}
-      </div>
+      <div className="text-2xl mb-3">{exerciseName}</div>
       {set?.duration && (
         <div
           className={`text-2xl mb-3 font-mono ${

@@ -11,6 +11,7 @@ import { ExerciseSet as ExerciseSetType } from "@/types";
 
 const ExerciseCardContext = createContext<{
   exerciseId: string;
+  exerciseName: string;
   lastSet: ExerciseSetType | null;
   deleteExercise: () => void;
   updateBpm: (setId: string, bpm: number) => void;
@@ -24,9 +25,11 @@ const ExerciseCardContext = createContext<{
 
 export function ExerciseCardProvider({
   exerciseId,
+  exerciseName,
   children,
 }: {
   exerciseId: string;
+  exerciseName: string;
   children: ReactNode;
 }) {
   const lastSet = useWorkoutExerciseStore((state) => {
@@ -108,6 +111,7 @@ export function ExerciseCardProvider({
   const context = useMemo(
     () => ({
       exerciseId,
+      exerciseName,
       lastSet,
       deleteExercise,
       updateBpm,
@@ -120,6 +124,7 @@ export function ExerciseCardProvider({
     }),
     [
       exerciseId,
+      exerciseName,
       lastSet,
       deleteExercise,
       updateBpm,

@@ -20,7 +20,7 @@ export const TrainerModal = memo(
     onOpenChange: (open: boolean) => void;
     exerciseId: string;
     exerciseName: string;
-    set: (ExerciseSetType & { setNo: number }) | null;
+    set: (ExerciseSetType & { setNo?: number }) | null;
   }) {
     const { updateDuration, updateFinished } = useExerciseCard();
 

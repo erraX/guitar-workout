@@ -3,7 +3,7 @@ import { ExerciseSet as ExerciseSetType } from "@/types";
 
 export const TrainerContext = createContext<{
   currentSet: ExerciseSetType | null;
-  setCurrentSet: (set: ExerciseSetType) => void;
+  setCurrentSet: (set: ExerciseSetType | null) => void;
 }>({
   currentSet: null,
   setCurrentSet: () => {},
