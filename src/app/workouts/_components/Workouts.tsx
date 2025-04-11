@@ -10,7 +10,17 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { createWorkout } from "@/actions/workout";
 
 import { AddExercise } from "@/app/workouts/_components/AddExercise";
-import { ExerciseCard } from "./ExerciseCard";
+import { ExerciseSet as ExerciseSetType } from "@/types";
+
+// import { ExerciseCard } from "./ExerciseCard";
+import {
+  ExerciseCard,
+  ExerciseCardHeader,
+  ExerciseCardHeaderActions,
+  ExerciseCardContent,
+  ExerciseSet,
+  ExerciseCardSetActions,
+} from "@/components/exercise-card";
 
 import { useBeforeUnload } from "@/hooks/useBeforeUnload";
 
@@ -113,15 +123,38 @@ export function Workouts({ exercises }: WorkoutsProps) {
           {workoutExercises.map((exercise) => (
             <ExerciseCard
               key={exercise.id}
-              id={exercise.id}
-              notes={exercise.notes}
+              exerciseId={exercise.id}
               className="mb-3"
-              title={getExerciseNameById(
-                exercises,
-                Number(exercise.exerciseId)
-              )}
-              sets={exercise.sets}
-            />
+            >
+              <ExerciseCardHeader>
+                <div className="flex flex-row justify-between items-center">
+                  <div className="text-ellipsis overflow-hidden whitespace-nowrap">
+                    {getExerciseNameById(
+                      exercises,
+                      Number(exercise.exerciseId)
+                    )}
+                  </div>
+                  <ExerciseCardHeaderActions />
+                </div>
+              </ExerciseCardHeader>
+              <ExerciseCardContent>
+                {exercise.sets.map((set) => (
+                  <ExerciseSet key={set.id} set={set} />
+                ))}
+                <ExerciseCardSetActions />
+              </ExerciseCardContent>
+            </ExerciseCard>
+            // <ExerciseCard
+            //   key={exercise.id}
+            //   id={exercise.id}
+            //   notes={exercise.notes}
+            //   className="mb-3"
+            //   title={getExerciseNameById(
+            //     exercises,
+            //     Number(exercise.exerciseId)
+            //   )}
+            //   sets={exercise.sets}
+            // />
           ))}
         </div>
       </div>
